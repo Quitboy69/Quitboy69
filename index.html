@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>To-Do</title>
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="description" content="Deine einfache To-Do-Liste – offline, schnell, mobil." />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <!-- iOS / Safari "Zum Home-Bildschirm" -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="To-Do" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-2: #273449;
+      --accent: #7c3aed;
+      --accent-2: #4f46e5;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --done: #22c55e;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    header {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      padding: 22px 20px 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.35);
+    }
+    header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
+    header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+
+    main { flex: 1; padding: 16px; overflow-y: auto; }
+
+    .input-row { display: flex; gap: 10px; margin-bottom: 18px; }
+    .input-row input {
+      flex: 1; padding: 14px 16px; border: none; border-radius: 14px;
+      background: var(--card); color: var(--text); font-size: 16px; outline: none;
+    }
+    .input-row input::placeholder { color: var(--muted); }
+    .input-row button {
+      border: none; border-radius: 14px; padding: 0 20px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff; font-size: 22px; font-weight: 700; cursor: pointer;
+      transition: transform .08s ease;
+    }
+    .input-row button:active { transform: scale(.92); }
+
+    ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    li {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card); border-radius: 14px; padding: 14px 16px;
+      animation: pop .18s ease;
+    }
+    @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .check {
+      width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--muted);
+      flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s ease; font-size: 15px; color: transparent;
+    }
+    li.done .check { background: var(--done); border-color: var(--done); color: #fff; }
+    .text { flex: 1; font-size: 16px; word-break: break-word; }
+    li.done .text { text-decoration: line-through; color: var(--muted); }
+    .del {
+      border: none; background: transparent; color: var(--muted);
+      font-size: 20px; cursor: pointer; padding: 4px 6px; border-radius: 8px;
+    }
+    .del:active { color: var(--danger); }
+
+    .empty { text-align: center; color: var(--muted); margin-top: 60px; font-size: 15px; }
+    .empty span { font-size: 44px; display: block; margin-bottom: 10px; }
+
+    footer { text-align: center; font-size: 12px; color: var(--muted); padding: 10px; }
+    #installHint {
+      display: none; margin: 0 16px 12px; padding: 12px 14px; border-radius: 12px;
+      background: var(--card-2); font-size: 13px; color: var(--muted); line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📝 To-Do</h1>
+    <p id="counter">Lege los – tippe deine erste Aufgabe ein.</p>
+  </header>
+
+  <div id="installHint">
+    💡 Tipp: Tippe unten auf <b>Teilen</b> und dann auf <b>„Zum Home-Bildschirm"</b>, um die App wie eine echte App zu installieren.
+  </div>
+
+  <main>
+    <div class="input-row">
+      <input type="text" id="taskInput" placeholder="Neue Aufgabe…" autocomplete="off" enterkeyhint="done" />
+      <button id="addBtn" aria-label="Hinzufügen">+</button>
+    </div>
+    <ul id="list"></ul>
+    <div class="empty" id="empty"><span>✅</span>Keine Aufgaben – alles erledigt!</div>
+  </main>
+
+  <footer>Offline gespeichert auf deinem Gerät</footer>
+
+  <script>
+    const STORAGE_KEY = "todo.items.v1";
+    let items = [];
+
+    try { items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { items = []; }
+
+    const list = document.getElementById("list");
+    const empty = document.getElementById("empty");
+    const counter = document.getElementById("counter");
+    const input = document.getElementById("taskInput");
+
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+    function render() {
+      list.innerHTML = "";
+      items.forEach((item, i) => {
+        const li = document.createElement("li");
+        if (item.done) li.classList.add("done");
+
+        const check = document.createElement("div");
+        check.className = "check";
+        check.textContent = "✓";
+        check.onclick = () => { items[i].done = !items[i].done; save(); render(); };
+
+        const text = document.createElement("div");
+        text.className = "text";
+        text.textContent = item.text;
+
+        const del = document.createElement("button");
+        del.className = "del";
+        del.textContent = "🗑";
+        del.setAttribute("aria-label", "Löschen");
+        del.onclick = () => { items.splice(i, 1); save(); render(); };
+
+        li.append(check, text, del);
+        list.appendChild(li);
+      });
+
+      const open = items.filter(x => !x.done).length;
+      empty.style.display = items.length ? "none" : "block";
+      counter.textContent = items.length
+        ? `${open} offen · ${items.length} gesamt`
+        : "Lege los – tippe deine erste Aufgabe ein.";
+    }
+
+    function addTask() {
+      const val = input.value.trim();
+      if (!val) return;
+      items.unshift({ text: val, done: false });
+      input.value = "";
+      save(); render();
+    }
+
+    document.getElementById("addBtn").onclick = addTask;
+    input.addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+
+    // iOS-Installationshinweis nur in Safari (nicht wenn schon installiert)
+    const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const standalone = window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
+    if (isiOS && !standalone) {
+      document.getElementById("installHint").style.display = "block";
+    }
+
+    render();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>
