@@ -3,188 +3,457 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>To-Do</title>
+  <title>AWL Lernen</title>
   <meta name="theme-color" content="#4f46e5" />
-  <meta name="description" content="Deine einfache To-Do-Liste – offline, schnell, mobil." />
+  <meta name="description" content="Arbeits- und Wirtschaftslehre lernen – Karteikarten, Quiz & Spickzettel fürs 1. Lehrjahr." />
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest" />
-
-  <!-- iOS / Safari "Zum Home-Bildschirm" -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="To-Do" />
+  <meta name="apple-mobile-web-app-title" content="AWL" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --card-2: #273449;
-      --accent: #7c3aed;
-      --accent-2: #4f46e5;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --danger: #ef4444;
-      --done: #22c55e;
+      --bg:#0f172a; --card:#1e293b; --card2:#273449; --line:#334155;
+      --accent:#7c3aed; --accent2:#4f46e5; --text:#e2e8f0; --muted:#94a3b8;
+      --green:#22c55e; --red:#ef4444; --amber:#f59e0b;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100dvh;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    header {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      padding: 22px 20px 18px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.35);
-    }
-    header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
-    header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;
+      padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+    header{background:linear-gradient(135deg,var(--accent),var(--accent2));padding:18px 18px 16px;
+      box-shadow:0 4px 18px rgba(0,0,0,.35);position:sticky;top:0;z-index:5;}
+    .htop{display:flex;align-items:center;gap:10px;}
+    .back{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;
+      width:38px;height:38px;border-radius:12px;cursor:pointer;flex:0 0 auto;display:none;}
+    header h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.4px;flex:1;}
+    header p{margin:6px 0 0;font-size:13px;opacity:.9;}
+    main{flex:1;padding:16px;overflow-y:auto;}
+    .hidden{display:none!important;}
 
-    main { flex: 1; padding: 16px; overflow-y: auto; }
+    /* generic */
+    .btn{border:none;border-radius:14px;padding:14px 16px;font-size:16px;font-weight:600;
+      cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      width:100%;transition:transform .08s ease;}
+    .btn:active{transform:scale(.97);}
+    .btn.ghost{background:var(--card);color:var(--text);}
+    .btn.green{background:var(--green);} .btn.row{width:auto;padding:12px 18px;}
 
-    .input-row { display: flex; gap: 10px; margin-bottom: 18px; }
-    .input-row input {
-      flex: 1; padding: 14px 16px; border: none; border-radius: 14px;
-      background: var(--card); color: var(--text); font-size: 16px; outline: none;
-    }
-    .input-row input::placeholder { color: var(--muted); }
-    .input-row button {
-      border: none; border-radius: 14px; padding: 0 20px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #fff; font-size: 22px; font-weight: 700; cursor: pointer;
-      transition: transform .08s ease;
-    }
-    .input-row button:active { transform: scale(.92); }
+    .banner{background:var(--card2);border-radius:14px;padding:14px 16px;margin-bottom:16px;
+      font-size:14px;line-height:1.55;color:var(--muted);}
+    .banner b{color:var(--text);}
+    .countdown{display:flex;gap:10px;margin-bottom:16px;}
+    .pill{flex:1;background:var(--card);border-radius:14px;padding:12px;text-align:center;}
+    .pill .num{font-size:24px;font-weight:800;color:#fff;}
+    .pill .lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;}
 
-    ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-    li {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--card); border-radius: 14px; padding: 14px 16px;
-      animation: pop .18s ease;
-    }
-    @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-    .check {
-      width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--muted);
-      flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all .15s ease; font-size: 15px; color: transparent;
-    }
-    li.done .check { background: var(--done); border-color: var(--done); color: #fff; }
-    .text { flex: 1; font-size: 16px; word-break: break-word; }
-    li.done .text { text-decoration: line-through; color: var(--muted); }
-    .del {
-      border: none; background: transparent; color: var(--muted);
-      font-size: 20px; cursor: pointer; padding: 4px 6px; border-radius: 8px;
-    }
-    .del:active { color: var(--danger); }
+    .topic{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;
+      display:flex;align-items:center;gap:14px;cursor:pointer;border:1px solid transparent;
+      transition:border-color .15s;}
+    .topic:active{border-color:var(--accent);}
+    .topic .emo{font-size:30px;flex:0 0 auto;}
+    .topic .info{flex:1;}
+    .topic .info h3{margin:0;font-size:16px;}
+    .topic .info small{color:var(--muted);font-size:12px;}
+    .bar{height:6px;background:var(--line);border-radius:99px;margin-top:8px;overflow:hidden;}
+    .bar i{display:block;height:100%;background:var(--green);width:0;border-radius:99px;transition:width .3s;}
 
-    .empty { text-align: center; color: var(--muted); margin-top: 60px; font-size: 15px; }
-    .empty span { font-size: 44px; display: block; margin-bottom: 10px; }
+    .sectitle{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);
+      margin:22px 4px 10px;font-weight:700;}
 
-    footer { text-align: center; font-size: 12px; color: var(--muted); padding: 10px; }
-    #installHint {
-      display: none; margin: 0 16px 12px; padding: 12px 14px; border-radius: 12px;
-      background: var(--card-2); font-size: 13px; color: var(--muted); line-height: 1.5;
-    }
+    /* topic menu */
+    .menu .btn{margin-bottom:12px;text-align:left;display:flex;align-items:center;gap:12px;}
+    .menu .btn .e{font-size:22px;}
+
+    /* flashcard */
+    .progresslbl{text-align:center;color:var(--muted);font-size:13px;margin-bottom:12px;}
+    .flip{perspective:1200px;height:340px;margin-bottom:18px;}
+    .flipinner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+      transition:transform .5s;cursor:pointer;}
+    .flip.flipped .flipinner{transform:rotateY(180deg);}
+    .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;padding:24px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+    .front{background:linear-gradient(135deg,var(--accent),var(--accent2));}
+    .front .q{font-size:24px;font-weight:700;line-height:1.3;}
+    .front .hint{position:absolute;bottom:18px;font-size:12px;opacity:.8;}
+    .back2{background:var(--card);transform:rotateY(180deg);border:1px solid var(--line);}
+    .back2 .a{font-size:17px;line-height:1.55;overflow-y:auto;}
+    .navrow{display:flex;gap:10px;}
+
+    /* quiz */
+    .qcard{background:var(--card);border-radius:18px;padding:20px;margin-bottom:16px;}
+    .qcard .qtext{font-size:19px;font-weight:700;line-height:1.35;margin-bottom:6px;}
+    .opt{background:var(--card2);border:2px solid transparent;border-radius:14px;padding:14px 16px;
+      margin-top:10px;font-size:15px;cursor:pointer;line-height:1.4;transition:.12s;}
+    .opt:active{border-color:var(--accent);}
+    .opt.correct{border-color:var(--green);background:rgba(34,197,94,.15);}
+    .opt.wrong{border-color:var(--red);background:rgba(239,68,68,.15);}
+    .explain{background:var(--card2);border-left:4px solid var(--accent);border-radius:10px;
+      padding:12px 14px;margin-top:14px;font-size:14px;line-height:1.5;color:var(--muted);display:none;}
+    .explain b{color:var(--text);}
+    .result{text-align:center;padding:30px 10px;}
+    .result .big{font-size:54px;}
+    .result h2{margin:10px 0 4px;}
+    .result p{color:var(--muted);margin:0 0 20px;}
+
+    /* cheat sheet */
+    .cs{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;}
+    .cs h4{margin:0 0 6px;font-size:16px;color:#fff;}
+    .cs p{margin:0;font-size:14px;line-height:1.55;color:var(--muted);}
+    .cs p b{color:var(--text);}
+
+    footer{text-align:center;font-size:11px;color:var(--muted);padding:14px;line-height:1.5;}
+    #installHint{display:none;margin:0 0 16px;padding:12px 14px;border-radius:12px;
+      background:var(--card2);font-size:13px;color:var(--muted);line-height:1.5;}
   </style>
 </head>
 <body>
   <header>
-    <h1>📝 To-Do</h1>
-    <p id="counter">Lege los – tippe deine erste Aufgabe ein.</p>
+    <div class="htop">
+      <button class="back" id="backBtn">‹</button>
+      <h1 id="title">📘 AWL Lernen</h1>
+    </div>
+    <p id="subtitle">Arbeits- &amp; Wirtschaftslehre · 1. Lehrjahr</p>
   </header>
 
-  <div id="installHint">
-    💡 Tipp: Tippe unten auf <b>Teilen</b> und dann auf <b>„Zum Home-Bildschirm"</b>, um die App wie eine echte App zu installieren.
-  </div>
+  <main id="app"></main>
 
-  <main>
-    <div class="input-row">
-      <input type="text" id="taskInput" placeholder="Neue Aufgabe…" autocomplete="off" enterkeyhint="done" />
-      <button id="addBtn" aria-label="Hinzufügen">+</button>
-    </div>
-    <ul id="list"></ul>
-    <div class="empty" id="empty"><span>✅</span>Keine Aufgaben – alles erledigt!</div>
-  </main>
-
-  <footer>Offline gespeichert auf deinem Gerät</footer>
+  <footer>
+    Selbst gemacht zum Lernen 💪 · Inhalte sind Lernhilfen –<br/>
+    im Zweifel gilt immer dein Schulbuch &amp; was die Lehrer sagen.
+  </footer>
 
   <script>
-    const STORAGE_KEY = "todo.items.v1";
-    let items = [];
+  /* ============ DATEN ============ */
+  const TOPICS = [
+    {
+      id:"wirtschaft", emoji:"🧺", title:"Wirtschaft & Bedürfnisse",
+      cards:[
+        ["Was ist ein Bedürfnis?","Ein <b>Mangelgefühl</b>, das man beseitigen möchte – z. B. Hunger, Durst, das Verlangen nach einem Handy."],
+        ["Grund-, Wahl- und Luxusbedürfnis?","<b>Grundbedürfnis:</b> lebensnotwendig (Essen, Wohnen).<br><b>Wahlbedürfnis:</b> wäre schön (Kino, Markenschuhe).<br><b>Luxusbedürfnis:</b> teuer & nicht nötig (Sportwagen)."],
+        ["Bedürfnis – Bedarf – Nachfrage?","<b>Bedürfnis</b> = Wunsch.<br><b>Bedarf</b> = Wunsch + Kaufkraft (ich kann es mir leisten).<br><b>Nachfrage</b> = Bedarf, der wirklich am Markt verlangt wird."],
+        ["Maslow-Pyramide (Reihenfolge)?","Von unten nach oben: 1) Grundbedürfnisse, 2) Sicherheit, 3) Soziales, 4) Anerkennung, 5) Selbstverwirklichung. Untere zuerst!"],
+        ["Sachgut oder Dienstleistung?","<b>Sachgut:</b> etwas Greifbares (Apfel, Auto).<br><b>Dienstleistung:</b> eine Leistung (Friseur, Beratung an der Kassa)."],
+        ["Ökonomisches Prinzip?","Wirtschaftlich handeln:<br><b>Minimalprinzip:</b> ein Ziel mit möglichst <i>wenig</i> Mitteln.<br><b>Maximalprinzip:</b> mit gegebenen Mitteln möglichst <i>viel</i> erreichen."]
+      ],
+      quiz:[
+        ["Was bedeutet 'Bedarf'?",["Ein Wunsch ganz ohne Geld","Ein Bedürfnis, das man sich auch leisten kann","Eine fertige Bestellung","Nur Luxusgüter"],1,"Bedarf = Bedürfnis + Kaufkraft. Erst wenn du es dir leisten kannst, wird aus dem Wunsch ein Bedarf."],
+        ["Wohnen und Essen sind …",["Luxusbedürfnisse","Wahlbedürfnisse","Grundbedürfnisse","Dienstleistungen"],2,"Grundbedürfnisse sind lebensnotwendig."],
+        ["Was steht ganz UNTEN in der Maslow-Pyramide?",["Anerkennung","Selbstverwirklichung","Grundbedürfnisse","Sicherheit"],2,"Zuerst kommen die Grundbedürfnisse (Essen, Trinken, Schlafen)."],
+        ["Die Beratung durch einen Verkäufer ist ein …",["Sachgut","Dienstleistung","Luxusgut","freies Gut"],1,"Eine Leistung statt etwas Greifbares = Dienstleistung."],
+        ["Minimalprinzip heißt …",["Ziel mit möglichst wenig Mitteln erreichen","Möglichst viel Geld ausgeben","Immer das Teuerste kaufen","Gar nichts tun"],0,"Mit möglichst wenig Aufwand ein festes Ziel erreichen."]
+      ]
+    },
+    {
+      id:"markt", emoji:"⚖️", title:"Markt & Preis",
+      cards:[
+        ["Was ist ein Markt?","Der <b>Ort (oder Online-Treffpunkt)</b>, an dem Angebot und Nachfrage zusammenkommen und ein Preis entsteht."],
+        ["Angebot und Nachfrage?","<b>Angebot:</b> Menge, die Verkäufer verkaufen wollen.<br><b>Nachfrage:</b> Menge, die Käufer kaufen wollen."],
+        ["Wie entsteht der Preis?","Durch das Zusammenspiel: Ist etwas <b>knapp und gefragt</b> → Preis steigt. Ist viel da und keiner will es → Preis sinkt."],
+        ["Was passiert bei viel Konkurrenz?","Mehrere Anbieter buhlen um Kunden → meist <b>niedrigere Preise</b> und bessere Angebote für die Kunden."],
+        ["Warum ist Hofer ein Diskonter?","Diskonter setzen auf <b>niedrige Preise</b>, schlanke Abläufe, große Mengen und Eigenmarken statt teurer Marken."]
+      ],
+      quiz:[
+        ["Was passiert mit dem Preis, wenn eine Ware knapp und sehr gefragt ist?",["Er sinkt","Er bleibt gleich","Er steigt","Er verschwindet"],2,"Knappheit + hohe Nachfrage → Preis steigt."],
+        ["Wo treffen Angebot und Nachfrage zusammen?",["Im Lager","Am Markt","In der Buchhaltung","Beim Lieferanten"],1,"Genau das ist die Definition eines Marktes."],
+        ["Viel Konkurrenz führt für Kunden meist zu …",["höheren Preisen","niedrigeren Preisen","weniger Auswahl","schlechterem Service"],1,"Anbieter müssen sich mit Preis & Service gegenseitig unterbieten."],
+        ["Diskonter wie Hofer setzen vor allem auf …",["Luxusmarken","niedrige Preise & Eigenmarken","wenig Ware","teure Beratung"],1,"Niedrige Preise, effiziente Abläufe und Eigenmarken sind typisch."]
+      ]
+    },
+    {
+      id:"kaufvertrag", emoji:"🤝", title:"Der Kaufvertrag",
+      cards:[
+        ["Wie kommt ein Kaufvertrag zustande?","Durch <b>zwei übereinstimmende Willenserklärungen</b>: ein <b>Antrag</b> (Angebot) und die <b>Annahme</b>. Beispiel: Kunde legt Ware aufs Band (Antrag), Kassier scannt & kassiert (Annahme)."],
+        ["Pflichten des Verkäufers?","1) Ware <b>liefern/übergeben</b>, 2) in <b>einwandfreiem Zustand</b> (mangelfrei)."],
+        ["Pflichten des Käufers?","1) Den <b>Kaufpreis zahlen</b>, 2) die <b>Ware annehmen</b>."],
+        ["Gewährleistung – was ist das?","Gesetzliche Pflicht des Verkäufers, für <b>Mängel</b> einzustehen, die schon beim Kauf da waren. In Österreich <b>2 Jahre</b> bei beweglichen Sachen. Kostenlos für den Kunden."],
+        ["Gewährleistung vs. Garantie?","<b>Gewährleistung:</b> gesetzlich verpflichtend.<br><b>Garantie:</b> <i>freiwilliges</i> Versprechen des Herstellers/Verkäufers – zusätzlich, nicht statt."],
+        ["Lieferverzug & Zahlungsverzug?","<b>Lieferverzug:</b> Verkäufer liefert zu spät.<br><b>Zahlungsverzug:</b> Käufer zahlt zu spät → es können Mahnungen & Verzugszinsen folgen."]
+      ],
+      quiz:[
+        ["Wodurch kommt ein Kaufvertrag zustande?",["Durch Bezahlen allein","Durch zwei übereinstimmende Willenserklärungen","Nur schriftlich","Durch eine Rechnung"],1,"Antrag + Annahme = Kaufvertrag. Mündlich reicht (z. B. an der Kassa)."],
+        ["Welche Pflicht hat der KÄUFER?",["Die Ware reparieren","Den Kaufpreis zahlen & Ware annehmen","Eine Garantie geben","Werbung machen"],1,"Zahlen und Annehmen sind die Käuferpflichten."],
+        ["Wie lange gilt in Österreich die Gewährleistung bei beweglichen Sachen?",["6 Monate","1 Jahr","2 Jahre","5 Jahre"],2,"Bei beweglichen Sachen sind es 2 Jahre."],
+        ["Gewährleistung ist …",["freiwillig vom Hersteller","gesetzlich verpflichtend","nur bei teuren Sachen","dasselbe wie Garantie"],1,"Gewährleistung ist Pflicht – Garantie ist freiwillig."],
+        ["Was ist 'Zahlungsverzug'?",["Verkäufer liefert zu spät","Käufer zahlt zu spät","Ware ist kaputt","Vertrag wird storniert"],1,"Der Käufer zahlt nicht rechtzeitig."]
+      ]
+    },
+    {
+      id:"zahlung", emoji:"💳", title:"Zahlung & Rechnung",
+      cards:[
+        ["Welche Zahlungsarten gibt es im Geschäft?","<b>Bar</b>, <b>Bankomat-/Debitkarte</b>, <b>Kreditkarte</b>, <b>kontaktlos</b> (Karte/Handy), teils <b>Gutscheine</b>."],
+        ["Was steht auf einem Kassabon/Rechnung?","Firma, Datum, Artikel + Menge + Preise, <b>Gesamtbetrag</b>, <b>USt (MwSt)</b>, Zahlungsart."],
+        ["Umsatzsteuer in Österreich?","<b>20 %</b> Normalsatz, <b>10 %</b> ermäßigt (z. B. viele Lebensmittel, Bücher). Die USt ist im Preis schon drin."],
+        ["Rabatt vs. Skonto?","<b>Rabatt:</b> Preisnachlass (z. B. Aktion -20 %).<br><b>Skonto:</b> kleiner Nachlass, wenn man <i>schnell</i> zahlt (typisch zwischen Firmen)."],
+        ["Was ist 'kontaktlos zahlen'?","Karte oder Handy nur kurz ans Terminal halten. Bis zu einem Betrag oft <b>ohne PIN</b>, darüber mit PIN."]
+      ],
+      quiz:[
+        ["Wie hoch ist der NORMALE Umsatzsteuersatz in Österreich?",["10 %","15 %","20 %","25 %"],2,"Normalsatz 20 %, ermäßigt 10 %."],
+        ["Was ist ein Rabatt?",["Nachlass fürs schnelle Zahlen","Ein allgemeiner Preisnachlass","Eine Steuer","Ein Trinkgeld"],1,"Rabatt = Preisnachlass. Skonto gibt's fürs schnelle Zahlen."],
+        ["Skonto bekommt man, wenn man …",["spät zahlt","schnell zahlt","bar zahlt","mit Karte zahlt"],1,"Skonto ist der Bonus fürs rasche Bezahlen."],
+        ["Was steht NICHT zwingend auf einem Kassabon?",["Gesamtbetrag","Datum","Lieblingsfarbe des Kassiers","Umsatzsteuer"],2,"Persönliche Dinge wie das gehören natürlich nicht drauf 🙂"]
+      ]
+    },
+    {
+      id:"lehrling", emoji:"🎓", title:"Lehrling: Rechte & Pflichten",
+      cards:[
+        ["Was ist ein Lehrvertrag?","Der <b>schriftliche Vertrag</b> zwischen dir und dem Lehrbetrieb (Hofer). Er regelt Beruf, Dauer, Lehrzeit und Entschädigung."],
+        ["Deine Pflichten als Lehrling?","<b>Lernen & mitarbeiten</b>, <b>Berufsschule besuchen</b>, pünktlich sein, sorgsam mit Material umgehen, Betriebsgeheimnisse wahren."],
+        ["Deine Rechte als Lehrling?","<b>Ausbildung</b> im Lehrberuf, <b>Lehrlingsentschädigung</b>, <b>bezahlte Berufsschulzeit</b>, Urlaub, Schutz als Jugendlicher."],
+        ["Pflichten des Lehrbetriebs?","Dich <b>ordentlich ausbilden</b>, zur Berufsschule <b>freistellen & bezahlen</b>, dich nicht für berufsfremde Dauerarbeiten missbrauchen."],
+        ["Probezeit?","Die ersten Wochen der Lehre sind <b>Probezeit</b> – da können beide den Vertrag noch leichter lösen."],
+        ["Arbeitszeit für Jugendliche?","Grundsätzlich max. <b>8 Stunden/Tag</b> und <b>40 Stunden/Woche</b>, mit Pausen und Nachtruhe – Jugendliche sind besonders geschützt."],
+        ["Wie endet die Lehre?","Mit der <b>Lehrabschlussprüfung (LAP)</b>. Bestehst du, bist du Facharbeiter/Fachkraft in deinem Beruf."]
+      ],
+      quiz:[
+        ["Was regelt der Lehrvertrag?",["Nur das Gehalt","Beruf, Dauer & Bedingungen der Lehre","Die Öffnungszeiten","Die Steuer"],1,"Er hält die wichtigsten Eckdaten deiner Ausbildung fest."],
+        ["Welche davon ist deine PFLICHT als Lehrling?",["Die Filiale leiten","Die Berufsschule besuchen","Andere ausbilden","Die Preise festlegen"],1,"Berufsschulbesuch ist Pflicht – und sie wird bezahlt."],
+        ["Die Berufsschulzeit ist für dich …",["unbezahlt","bezahlt","freiwillig","in der Freizeit"],1,"Der Betrieb stellt dich frei und bezahlt die Schulzeit."],
+        ["Wie viele Stunden pro Tag dürfen Jugendliche grundsätzlich arbeiten?",["6","8","10","12"],1,"Grundsätzlich max. 8 Stunden/Tag, 40/Woche."],
+        ["Womit endet die Lehre?",["Mit einem Test in der Schule","Mit der Lehrabschlussprüfung (LAP)","Mit dem 18. Geburtstag","Automatisch nach 1 Jahr"],1,"Die LAP schließt die Lehre ab."]
+      ]
+    },
+    {
+      id:"verkauf", emoji:"🛒", title:"Im Geschäft & Verkauf",
+      cards:[
+        ["Schritte der Warenannahme?","Ware <b>annehmen</b> → mit <b>Lieferschein prüfen</b> (Menge, Schäden, Ablaufdatum) → <b>einlagern</b> bzw. ins Regal."],
+        ["FIFO – was heißt das?","<b>First In, First Out:</b> ältere Ware nach vorne, neue nach hinten. So wird das mit dem kürzeren Ablaufdatum zuerst verkauft."],
+        ["Gutes Verkaufsgespräch?","Freundlich <b>begrüßen</b>, <b>Bedarf erfragen</b>, passend <b>beraten</b>, <b>Zusatz</b> anbieten, freundlich <b>verabschieden</b>."],
+        ["Reklamation richtig behandeln?","<b>Ruhig zuhören</b>, ernst nehmen, sich nicht streiten, eine <b>Lösung anbieten</b> (Umtausch/Ersatz im Rahmen der Regeln)."],
+        ["Umtausch – Pflicht oder Kulanz?","Im Geschäft gibt es <b>kein gesetzliches Rücktrittsrecht</b> (außer bei Mängeln). Umtausch ist meist <b>freiwillige Kulanz</b> des Geschäfts."],
+        ["Rücktrittsrecht beim Online-Kauf?","Bei Online-/Fernabsatz hast du als Konsument meist <b>14 Tage</b> Zeit, ohne Grund zurückzutreten. Im Laden gilt das nicht!"]
+      ],
+      quiz:[
+        ["Was bedeutet FIFO?",["First In, First Out","Fast In, Fast Out","Find It, Fix Out","Frische Immer Frei Ordnen"],0,"Älteste Ware zuerst verkaufen – nach vorne räumen."],
+        ["Beim Wareneingang prüfst du vor allem …",["die Lieblingsmarke","Menge, Schäden & Ablaufdatum","das Wetter","die Kundennamen"],1,"Stimmt alles mit dem Lieferschein, ist nichts kaputt/abgelaufen?"],
+        ["Wie reagierst du bei einer Reklamation?",["Zurückschimpfen","Ruhig zuhören & Lösung anbieten","Kunden ignorieren","Sofort wegschicken"],1,"Ruhe bewahren, ernst nehmen, Lösung finden."],
+        ["Umtausch im Geschäft (ohne Mangel) ist …",["gesetzlich vorgeschrieben","freiwillige Kulanz","verboten","nur online möglich"],1,"Ohne Mangel ist Umtausch im Laden Kulanz, keine Pflicht."],
+        ["Wie viele Tage Rücktrittsrecht hat man beim Online-Kauf meist?",["3","7","14","30"],2,"Bei Fernabsatz meist 14 Tage ohne Begründung."]
+      ]
+    }
+  ];
 
-    try { items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { items = []; }
+  const EXAM_DATE = new Date("2026-07-12T00:00:00");
 
-    const list = document.getElementById("list");
-    const empty = document.getElementById("empty");
-    const counter = document.getElementById("counter");
-    const input = document.getElementById("taskInput");
+  /* ============ STATE ============ */
+  const KEY = "awl.progress.v1";
+  let prog = {};
+  try { prog = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ prog = {}; }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(prog)); }
+  function bestFor(id){ return prog[id]?.best || 0; }
+  function setBest(id, pct){ prog[id]=prog[id]||{}; if(pct>(prog[id].best||0)) prog[id].best=pct; save(); }
 
-    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+  const app = document.getElementById("app");
+  const titleEl = document.getElementById("title");
+  const subEl = document.getElementById("subtitle");
+  const backBtn = document.getElementById("backBtn");
+  let stack = [];
 
-    function render() {
-      list.innerHTML = "";
-      items.forEach((item, i) => {
-        const li = document.createElement("li");
-        if (item.done) li.classList.add("done");
+  function go(view, data){ stack.push({view,data}); render(); }
+  function back(){ stack.pop(); render(); }
+  backBtn.onclick = back;
 
-        const check = document.createElement("div");
-        check.className = "check";
-        check.textContent = "✓";
-        check.onclick = () => { items[i].done = !items[i].done; save(); render(); };
+  function setHeader(t, s){
+    titleEl.textContent = t;
+    subEl.textContent = s;
+    backBtn.style.display = stack.length>1 ? "block":"none";
+  }
 
-        const text = document.createElement("div");
-        text.className = "text";
-        text.textContent = item.text;
+  function render(){
+    const cur = stack[stack.length-1];
+    app.innerHTML = "";
+    if(cur.view==="home") return renderHome();
+    if(cur.view==="topic") return renderTopicMenu(cur.data);
+    if(cur.view==="cards") return renderCards(cur.data);
+    if(cur.view==="quiz") return renderQuiz(cur.data);
+    if(cur.view==="cheat") return renderCheat();
+  }
 
-        const del = document.createElement("button");
-        del.className = "del";
-        del.textContent = "🗑";
-        del.setAttribute("aria-label", "Löschen");
-        del.onclick = () => { items.splice(i, 1); save(); render(); };
+  /* ---- HOME ---- */
+  function renderHome(){
+    setHeader("📘 AWL Lernen", "Arbeits- & Wirtschaftslehre · 1. Lehrjahr");
+    const days = Math.max(0, Math.ceil((EXAM_DATE - new Date())/86400000));
+    let done=0,total=TOPICS.length;
+    TOPICS.forEach(t=>{ if(bestFor(t.id)>=60) done++; });
 
-        li.append(check, text, del);
-        list.appendChild(li);
+    const wrap=document.createElement("div");
+    wrap.innerHTML = `
+      <div id="installHint">💡 <b>Tipp:</b> Tippe in Safari unten auf <b>Teilen</b> → <b>„Zum Home-Bildschirm"</b>. Dann hast du die App wie eine echte App auf dem Handy – auch ohne Internet.</div>
+      <div class="banner">Hey! 👋 Schön, dass du da bist. Mach in kleinen Häppchen weiter – <b>jeden Tag ein bisschen</b> ist besser als alles auf einmal. Du schaffst das. 💪</div>
+      <div class="countdown">
+        <div class="pill"><div class="num">${days}</div><div class="lbl">Tage bis 12. Juli</div></div>
+        <div class="pill"><div class="num">${done}/${total}</div><div class="lbl">Themen geschafft</div></div>
+      </div>
+      <div class="sectitle">Themen</div>
+    `;
+    TOPICS.forEach(t=>{
+      const best=bestFor(t.id);
+      const el=document.createElement("div");
+      el.className="topic";
+      el.innerHTML=`<div class="emo">${t.emoji}</div>
+        <div class="info">
+          <h3>${t.title}</h3>
+          <small>${t.cards.length} Karteikarten · ${t.quiz.length} Quizfragen${best?` · bestes Quiz: ${best}%`:""}</small>
+          <div class="bar"><i style="width:${best}%"></i></div>
+        </div>`;
+      el.onclick=()=>go("topic",t);
+      wrap.appendChild(el);
+    });
+
+    const cheat=document.createElement("button");
+    cheat.className="btn ghost";
+    cheat.style.marginTop="16px";
+    cheat.innerHTML="📋 Spickzettel – alles auf einen Blick";
+    cheat.onclick=()=>go("cheat");
+    wrap.appendChild(cheat);
+
+    const tips=document.createElement("div");
+    tips.className="banner";
+    tips.style.marginTop="20px";
+    tips.innerHTML="<b>So lernst du am besten:</b><br>1️⃣ Erst <b>Karteikarten</b> durchgehen (verstehen).<br>2️⃣ Dann das <b>Quiz</b> machen (prüfen).<br>3️⃣ Falsche Fragen am nächsten Tag <b>nochmal</b>.<br>4️⃣ Lieber 15 Min am Tag als 3 Std auf einmal.";
+    wrap.appendChild(tips);
+
+    app.appendChild(wrap);
+
+    const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const standalone=window.navigator.standalone||window.matchMedia("(display-mode: standalone)").matches;
+    if(isiOS&&!standalone){ const h=document.getElementById("installHint"); if(h) h.style.display="block"; }
+  }
+
+  /* ---- TOPIC MENU ---- */
+  function renderTopicMenu(t){
+    setHeader(t.emoji+" "+t.title, "Wähle aus, wie du lernen willst");
+    const wrap=document.createElement("div");
+    wrap.className="menu";
+    wrap.innerHTML=`
+      <button class="btn" id="bCards"><span class="e">📚</span> Karteikarten lernen</button>
+      <button class="btn green" id="bQuiz"><span class="e">❓</span> Quiz starten (${t.quiz.length} Fragen)</button>
+    `;
+    app.appendChild(wrap);
+    document.getElementById("bCards").onclick=()=>go("cards",{t,i:0,flipped:false});
+    document.getElementById("bQuiz").onclick=()=>go("quiz",{t,i:0,score:0,answered:false});
+  }
+
+  /* ---- FLASHCARDS ---- */
+  function renderCards(st){
+    const {t}=st;
+    setHeader(t.emoji+" Karteikarten", t.title);
+    const card=t.cards[st.i];
+    const wrap=document.createElement("div");
+    wrap.innerHTML=`
+      <div class="progresslbl">Karte ${st.i+1} von ${t.cards.length}</div>
+      <div class="flip ${st.flipped?"flipped":""}" id="flip">
+        <div class="flipinner">
+          <div class="face front"><div class="q">${card[0]}</div><div class="hint">👆 Tippen zum Umdrehen</div></div>
+          <div class="face back2"><div class="a">${card[1]}</div></div>
+        </div>
+      </div>
+      <div class="navrow">
+        <button class="btn ghost row" id="prev" style="flex:1">‹ Zurück</button>
+        <button class="btn row" id="next" style="flex:1">${st.i===t.cards.length-1?"Fertig ✓":"Weiter ›"}</button>
+      </div>
+    `;
+    app.appendChild(wrap);
+    document.getElementById("flip").onclick=()=>{ st.flipped=!st.flipped; render(); };
+    document.getElementById("prev").onclick=()=>{ if(st.i>0){st.i--;st.flipped=false;render();} };
+    document.getElementById("next").onclick=()=>{
+      if(st.i<t.cards.length-1){ st.i++; st.flipped=false; render(); }
+      else back();
+    };
+  }
+
+  /* ---- QUIZ ---- */
+  function renderQuiz(st){
+    const {t}=st;
+    if(st.i>=t.quiz.length) return renderQuizResult(st);
+    setHeader(t.emoji+" Quiz", `Frage ${st.i+1} von ${t.quiz.length} · ${st.score} Punkte`);
+    const q=t.quiz[st.i];
+    const wrap=document.createElement("div");
+    const optsHtml=q[1].map((o,idx)=>`<div class="opt" data-i="${idx}">${o}</div>`).join("");
+    wrap.innerHTML=`
+      <div class="progresslbl">Frage ${st.i+1} / ${t.quiz.length}</div>
+      <div class="qcard">
+        <div class="qtext">${q[0]}</div>
+        ${optsHtml}
+        <div class="explain" id="explain"></div>
+      </div>
+      <button class="btn hidden" id="nextQ">${st.i===t.quiz.length-1?"Ergebnis ansehen ›":"Nächste Frage ›"}</button>
+    `;
+    app.appendChild(wrap);
+    const explain=document.getElementById("explain");
+    const nextQ=document.getElementById("nextQ");
+    wrap.querySelectorAll(".opt").forEach(opt=>{
+      opt.onclick=()=>{
+        if(st.answered) return;
+        st.answered=true;
+        const chosen=+opt.dataset.i;
+        const correct=q[2];
+        wrap.querySelectorAll(".opt").forEach((o,idx)=>{
+          if(idx===correct) o.classList.add("correct");
+          if(idx===chosen&&chosen!==correct) o.classList.add("wrong");
+        });
+        if(chosen===correct) st.score++;
+        explain.innerHTML=(chosen===correct?"✅ <b>Richtig!</b> ":"❌ <b>Nicht ganz.</b> ")+q[3];
+        explain.style.display="block";
+        nextQ.classList.remove("hidden");
+      };
+    });
+    nextQ.onclick=()=>{ st.i++; st.answered=false; render(); };
+  }
+
+  function renderQuizResult(st){
+    const {t}=st;
+    const pct=Math.round(st.score/t.quiz.length*100);
+    setBest(t.id,pct);
+    setHeader(t.emoji+" Ergebnis", t.title);
+    let emo="💪",msg="Dranbleiben – Wiederholung macht den Meister!";
+    if(pct>=90){emo="🏆";msg="Mega! Das sitzt richtig gut.";}
+    else if(pct>=60){emo="👍";msg="Schon stark! Ein, zwei Themen noch wiederholen.";}
+    const wrap=document.createElement("div");
+    wrap.innerHTML=`
+      <div class="result">
+        <div class="big">${emo}</div>
+        <h2>${st.score} von ${t.quiz.length} richtig</h2>
+        <p>${pct}% · ${msg}</p>
+        <button class="btn" id="again">🔁 Nochmal versuchen</button>
+        <button class="btn ghost" id="homeB" style="margin-top:10px">📚 Karteikarten ansehen</button>
+        <button class="btn ghost" id="back2" style="margin-top:10px">‹ Zur Übersicht</button>
+      </div>`;
+    app.appendChild(wrap);
+    document.getElementById("again").onclick=()=>{ stack[stack.length-1]={view:"quiz",data:{t,i:0,score:0,answered:false}}; render(); };
+    document.getElementById("homeB").onclick=()=>{ stack[stack.length-1]={view:"cards",data:{t,i:0,flipped:false}}; render(); };
+    document.getElementById("back2").onclick=()=>{ stack=[{view:"home"}]; render(); };
+  }
+
+  /* ---- CHEAT SHEET ---- */
+  function renderCheat(){
+    setHeader("📋 Spickzettel","Alle Begriffe zum Nachlesen");
+    const wrap=document.createElement("div");
+    TOPICS.forEach(t=>{
+      const h=document.createElement("div");
+      h.className="sectitle";
+      h.textContent=t.emoji+" "+t.title;
+      wrap.appendChild(h);
+      t.cards.forEach(c=>{
+        const d=document.createElement("div");
+        d.className="cs";
+        d.innerHTML=`<h4>${c[0]}</h4><p>${c[1]}</p>`;
+        wrap.appendChild(d);
       });
+    });
+    app.appendChild(wrap);
+  }
 
-      const open = items.filter(x => !x.done).length;
-      empty.style.display = items.length ? "none" : "block";
-      counter.textContent = items.length
-        ? `${open} offen · ${items.length} gesamt`
-        : "Lege los – tippe deine erste Aufgabe ein.";
-    }
+  /* ---- START ---- */
+  stack=[{view:"home"}];
+  render();
 
-    function addTask() {
-      const val = input.value.trim();
-      if (!val) return;
-      items.unshift({ text: val, done: false });
-      input.value = "";
-      save(); render();
-    }
-
-    document.getElementById("addBtn").onclick = addTask;
-    input.addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
-
-    // iOS-Installationshinweis nur in Safari (nicht wenn schon installiert)
-    const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const standalone = window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
-    if (isiOS && !standalone) {
-      document.getElementById("installHint").style.display = "block";
-    }
-
-    render();
-
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
-    }
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  }
   </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 // Service Worker – macht die App offline-fähig
-const CACHE = "todo-v1";
+const CACHE = "awl-v1";
 const ASSETS = [
   "./",
   "./index.html",

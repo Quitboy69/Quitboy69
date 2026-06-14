@@ -1,7 +1,7 @@
 {
-  "name": "To-Do Liste",
-  "short_name": "To-Do",
-  "description": "Deine einfache To-Do-Liste – offline, schnell, mobil.",
+  "name": "AWL Lernen",
+  "short_name": "AWL",
+  "description": "Arbeits- und Wirtschaftslehre lernen – Karteikarten, Quiz & Spickzettel fürs 1. Lehrjahr.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
