@@ -11,7 +11,7 @@ class App {
   App(Display& display, Input& input) : display_(display), input_(input) {}
 
   // Takes ownership of the module pointer.
-  void add(Module* m) { modules_.push_back(m); }
+  void add(AppModule* m) { modules_.push_back(m); }
 
   void begin();
   void loop();
@@ -26,11 +26,11 @@ class App {
 
   Display& display_;
   Input& input_;
-  std::vector<Module*> modules_;
+  std::vector<AppModule*> modules_;
 
   State state_ = State::Menu;
   int menuIndex_ = 0;
   int menuTop_ = 0;  // first visible row for scrolling
-  Module* active_ = nullptr;
+  AppModule* active_ = nullptr;
   uint32_t lastFrame_ = 0;
 };

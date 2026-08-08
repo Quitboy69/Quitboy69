@@ -11,7 +11,7 @@
 
 #include "core/Module.h"
 
-class LoraChat : public Module {
+class LoraChat : public AppModule {
  public:
   const char* name() const override { return "LoRa Chat"; }
   void onEnter() override;

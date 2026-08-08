@@ -6,7 +6,7 @@
 #pragma once
 #include "core/Module.h"
 
-class LoraSpectrum : public Module {
+class LoraSpectrum : public AppModule {
  public:
   const char* name() const override { return "LoRa Spectrum"; }
   void onEnter() override;

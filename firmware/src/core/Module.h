@@ -7,9 +7,11 @@
 #include "ui/Display.h"
 #include "ui/Input.h"
 
-class Module {
+// Named AppModule (not Module) to avoid clashing with RadioLib's global
+// `Module` class, which our LoRa tools also pull in.
+class AppModule {
  public:
-  virtual ~Module() = default;
+  virtual ~AppModule() = default;
 
   // Short label shown in the main menu.
   virtual const char* name() const = 0;

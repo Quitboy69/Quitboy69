@@ -7,7 +7,7 @@
 #pragma once
 #include "core/Module.h"
 
-class WifiMonitor : public Module {
+class WifiMonitor : public AppModule {
  public:
   const char* name() const override { return "WiFi Monitor"; }
   void onEnter() override;

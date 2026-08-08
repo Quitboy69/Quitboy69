@@ -9,7 +9,7 @@
 
 #include "core/Module.h"
 
-class BleScanner : public Module {
+class BleScanner : public AppModule {
  public:
   const char* name() const override { return "BLE Scan"; }
   void onEnter() override;

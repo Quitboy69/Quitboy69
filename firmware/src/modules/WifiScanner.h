@@ -8,7 +8,7 @@
 
 #include "core/Module.h"
 
-class WifiScanner : public Module {
+class WifiScanner : public AppModule {
  public:
   const char* name() const override { return "WiFi Scan"; }
   void onEnter() override;

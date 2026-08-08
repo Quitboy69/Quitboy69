@@ -2,7 +2,7 @@
 #pragma once
 #include "core/Module.h"
 
-class SystemInfo : public Module {
+class SystemInfo : public AppModule {
  public:
   const char* name() const override { return "System Info"; }
   void draw(Display& d, int contentTop) override;
