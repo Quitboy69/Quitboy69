@@ -2,21 +2,21 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Jarvis: venv anlegen",
+            "label": "Jarvis: Einrichten (Text-Modus)",
+            "detail": "Legt .venv an und installiert die leichten Pakete (anthropic, PySide6). Einmal ausführen.",
             "type": "shell",
-            "command": "python3 -m venv .venv",
+            "command": "python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip install -r requirements-text.txt",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": []
         },
         {
-            "label": "Jarvis: Abhängigkeiten installieren",
+            "label": "Jarvis: GUI starten",
+            "detail": "Startet die grafische Oberfläche (Textbedienung).",
             "type": "shell",
-            "command": "${workspaceFolder}/.venv/bin/pip install -r jarvis/requirements.txt",
-            "problemMatcher": []
-        },
-        {
-            "label": "Jarvis: Voll-Setup (setup.sh)",
-            "type": "shell",
-            "command": "bash jarvis/setup.sh",
+            "command": "${workspaceFolder}/.venv/bin/python -m jarvis.main",
             "problemMatcher": []
         },
         {
@@ -30,9 +30,10 @@
             "problemMatcher": []
         },
         {
-            "label": "Jarvis: GUI starten",
+            "label": "Jarvis: Voll-Setup (Sprache + Kamera)",
+            "detail": "Optional: installiert zusätzlich Whisper, Piper, YOLO und lädt die Modelle.",
             "type": "shell",
-            "command": "${workspaceFolder}/.venv/bin/python -m jarvis.main",
+            "command": "bash jarvis/setup.sh",
             "problemMatcher": []
         }
     ]
