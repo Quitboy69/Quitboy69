@@ -1,3 +1,27 @@
 {
-    "workbench.editor.defaultBinaryEditor": "jsProfileVisualizer.cpuprofile.table"
+    "workbench.editor.defaultBinaryEditor": "jsProfileVisualizer.cpuprofile.table",
+
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.envFile": "${workspaceFolder}/.env",
+
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "jarvis/tests"
+    ],
+
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true
+    },
+
+    "[python]": {
+        "editor.rulers": [100],
+        "editor.formatOnSave": false
+    }
 }

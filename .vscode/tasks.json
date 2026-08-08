@@ -1,0 +1,39 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Jarvis: venv anlegen",
+            "type": "shell",
+            "command": "python3 -m venv .venv",
+            "problemMatcher": []
+        },
+        {
+            "label": "Jarvis: Abhängigkeiten installieren",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/pip install -r jarvis/requirements.txt",
+            "problemMatcher": []
+        },
+        {
+            "label": "Jarvis: Voll-Setup (setup.sh)",
+            "type": "shell",
+            "command": "bash jarvis/setup.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Jarvis: Tests ausführen",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python -m pytest jarvis/tests -v",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Jarvis: GUI starten",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python -m jarvis.main",
+            "problemMatcher": []
+        }
+    ]
+}

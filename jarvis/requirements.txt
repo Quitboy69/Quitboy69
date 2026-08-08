@@ -1,0 +1,27 @@
+# --- Agent (Planung & Reasoning) ---
+anthropic>=0.116.0
+
+# --- GUI ---
+PySide6>=6.6
+pyqtgraph>=0.13
+
+# --- Systemdaten ---
+psutil>=5.9
+
+# --- Audio (Wake Word + Aufnahme/Wiedergabe) ---
+sounddevice>=0.4
+numpy>=1.24
+
+# --- Spracherkennung (Speech-to-Text) ---
+faster-whisper>=1.0        # Alternative: whisper.cpp per CLI
+
+# --- Sprachausgabe (Text-to-Speech) ---
+piper-tts>=1.2
+
+# --- Wake Word (eine Engine genügt) ---
+openwakeword>=0.6
+# pvporcupine>=3.0          # Alternative (Picovoice)
+
+# --- Kamera / Objekterkennung ---
+ultralytics>=8.3            # YOLOv11
+opencv-python>=4.9
