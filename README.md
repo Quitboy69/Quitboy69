@@ -121,7 +121,22 @@ Das Projekt bringt eine fertige `.vscode`-Konfiguration mit.
 Die Tests laufen auch direkt im Test-Explorer (pytest ist vorkonfiguriert) und
 brauchen weder API-Key noch Netzwerk.
 
+## Bedienung: Text statt Stimme
+
+Standardmäßig läuft Jarvis als **Text-Assistent**: du tippst eine Nachricht
+(GUI-Textfeld oder Konsole), er reagiert. Es wird **nichts** mitgehört – kein
+Wake-Word, keine Mikrofon-Aufnahme. Antworten werden nur dann vorgelesen, wenn
+eine Piper-Stimme installiert ist; sonst bleibt es rein textbasiert.
+
+Sprachsteuerung lässt sich jederzeit wieder einschalten in `jarvis/config.py`:
+
+```python
+enable_voice_input: bool = True    # Mikrofon + Whisper
+enable_wake_word: bool = True      # Aktivierungswort "jarvis"
+enable_voice_output: bool = True   # Antworten vorlesen
+```
+
 ## Konfiguration
 
 Alle Einstellungen (Modell, Whisper-Größe, Piper-Stimme, Kamera-Index, YOLO-Modell,
-Bestätigungspflicht) stehen zentral in `jarvis/config.py`.
+Bestätigungspflicht, Sprachsteuerung) stehen zentral in `jarvis/config.py`.

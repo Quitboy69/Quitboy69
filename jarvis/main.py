@@ -37,7 +37,8 @@ class JarvisCore:
 
     def __init__(self, gui=None) -> None:
         self.gui = gui
-        self.stt = SpeechToText()
+        # Spracherkennung nur laden, wenn eingeschaltet (Standard: aus).
+        self.stt = SpeechToText() if CONFIG.enable_voice_input else None
         self.tts = TextToSpeech()
         self.vision = VisionSystem()
 
@@ -62,6 +63,12 @@ class JarvisCore:
         self._mic_active = False
         self._running = True
         self._request_q: queue.Queue[str] = queue.Queue()
+
+    # ----------------------------------------------------------- Sprachausgabe
+    def _speak(self, text: str) -> None:
+        """Liest Text vor, wenn die Ausgabe aktiv und eine Stimme vorhanden ist."""
+        if CONFIG.enable_voice_output and self.tts.backend != "none":
+            self.tts.speak(text)
 
     # ----------------------------------------------------------- Werkzeuge
     def _vision_tool(self) -> str:
@@ -90,16 +97,18 @@ class JarvisCore:
             self.gui.sig_confirm.emit(description, result.put)
             return result.get()
         # Konsole
-        self.tts.speak(description + " Ausführen? Ja oder Nein.")
+        self._speak(description + " Ausführen? Ja oder Nein.")
         answer = input(f"{description}\nAusführen? [Ja/Nein] ").strip().lower()
         return answer in ("ja", "j", "yes", "y")
 
     # -------------------------------------------------------------- Fluss
     def on_wake(self) -> None:
         """Wird ausgelöst, wenn das Aktivierungswort erkannt wurde."""
+        if self.stt is None:
+            return
         self._set_mic(True)
         self._thought("Aktivierungswort erkannt – ich höre zu …")
-        self.tts.speak("Ja?")
+        self._speak("Ja?")
         user_text = self.stt.listen()
         self._set_mic(False)
         if not user_text:
@@ -131,7 +140,7 @@ class JarvisCore:
                 self.gui.sig_tool.emit("—")
             else:
                 print(f"Jarvis: {answer}")
-            self.tts.speak(answer)
+            self._speak(answer)
 
     def _stats_loop(self) -> None:
         while self._running:
@@ -155,14 +164,20 @@ class JarvisCore:
         threading.Thread(target=self._process_loop, daemon=True).start()
         threading.Thread(target=self._stats_loop, daemon=True).start()
         threading.Thread(target=self._camera_loop, daemon=True).start()
-        self._wake = WakeWordListener(on_wake=self.on_wake)
-        self._thought(f"Wake-Word-Backend: {self._wake.backend}")
-        threading.Thread(target=self._wake.listen_loop, daemon=True).start()
+
+        self._wake = None
+        if CONFIG.enable_voice_input and CONFIG.enable_wake_word:
+            self._wake = WakeWordListener(on_wake=self.on_wake)
+            self._thought(f"Wake-Word-Backend: {self._wake.backend}")
+            threading.Thread(target=self._wake.listen_loop, daemon=True).start()
+        else:
+            self._thought("Sprachsteuerung ist aus – bitte tippe deine Nachricht.")
 
     def shutdown(self) -> None:
         self._running = False
         try:
-            self._wake.stop()
+            if self._wake is not None:
+                self._wake.stop()
         except Exception:
             pass
         self.vision.release()
@@ -171,7 +186,8 @@ class JarvisCore:
 def run_console() -> None:
     core = JarvisCore(gui=None)
     print("Jarvis (Konsolenmodus). Tippe eine Nachricht oder 'exit'.")
-    print(f"STT: {core.stt.backend} | TTS: {core.tts.backend} | Vision: {core.vision.backend}")
+    stt_backend = core.stt.backend if core.stt else "aus"
+    print(f"STT: {stt_backend} | TTS: {core.tts.backend} | Vision: {core.vision.backend}")
     core.start_background()
     try:
         while True:

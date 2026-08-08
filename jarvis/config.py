@@ -13,6 +13,13 @@ class Config:
     max_tokens: int = 16000
     effort: str = "high"  # low | medium | high | xhigh | max
 
+    # --- Sprachsteuerung (an/aus) ---
+    # Standard: reine Text-Bedienung. Jarvis reagiert auf getippte Nachrichten,
+    # hört aber nichts mit (kein Wake-Word, keine Mikrofon-Aufnahme).
+    enable_voice_input: bool = False     # Mikrofon + Whisper (Spracherkennung)
+    enable_wake_word: bool = False       # Aktivierungswort "jarvis"
+    enable_voice_output: bool = True     # Antworten vorlesen, wenn eine Stimme da ist
+
     # --- Wake Word ---
     wake_word: str = "jarvis"
     wake_word_threshold: float = 0.5
