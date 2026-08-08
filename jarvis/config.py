@@ -3,7 +3,37 @@
 from __future__ import annotations
 
 import os
+import pathlib
 from dataclasses import dataclass, field
+
+
+def _load_dotenv() -> None:
+    """Liest eine .env-Datei ein (ohne Zusatzpaket) und setzt Umgebungsvariablen.
+
+    Sucht im aktuellen Ordner und im Projekt-Stammverzeichnis. Bereits gesetzte
+    Variablen werden nicht überschrieben, damit ein Terminal-Export Vorrang hat.
+    """
+    candidates = [
+        pathlib.Path.cwd() / ".env",
+        pathlib.Path(__file__).resolve().parent.parent / ".env",
+    ]
+    seen: set[pathlib.Path] = set()
+    for path in candidates:
+        if path in seen or not path.is_file():
+            continue
+        seen.add(path)
+        for raw in path.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
+_load_dotenv()
 
 
 @dataclass

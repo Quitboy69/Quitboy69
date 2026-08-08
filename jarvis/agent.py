@@ -139,6 +139,21 @@ class JarvisAgent:
     def ready(self) -> bool:
         return self._client is not None
 
+    @staticmethod
+    def _friendly_error(exc: Exception) -> str:
+        """Wandelt API-Fehler in eine verständliche Meldung um."""
+        msg = str(exc).lower()
+        if any(w in msg for w in ("authentication", "401", "invalid x-api-key", "api key", "api_key")):
+            return (
+                "Der API-Schlüssel wird nicht akzeptiert. Bitte trage einen gültigen "
+                "ANTHROPIC_API_KEY in die .env-Datei ein (Format: sk-ant-…) und starte neu."
+            )
+        if any(w in msg for w in ("rate limit", "429", "overloaded", "529")):
+            return "Der Dienst ist gerade ausgelastet. Bitte kurz warten und erneut versuchen."
+        if any(w in msg for w in ("connection", "network", "timeout", "getaddrinfo")):
+            return "Keine Verbindung zum Sprachdienst. Bitte Internetverbindung prüfen."
+        return f"Fehler beim Sprachdienst: {exc}"
+
     def _run_tool(self, name: str, tool_input: dict) -> str:
         func = self.tools.get(name)
         if func is None:
@@ -162,14 +177,17 @@ class JarvisAgent:
         self.thought_cb("Analysiere die Anfrage …")
 
         while True:
-            response = self._client.messages.create(
-                model=CONFIG.model,
-                max_tokens=CONFIG.max_tokens,
-                output_config={"effort": CONFIG.effort},
-                system=SYSTEM_PROMPT,
-                tools=self.tool_defs,
-                messages=self.messages,
-            )
+            try:
+                response = self._client.messages.create(
+                    model=CONFIG.model,
+                    max_tokens=CONFIG.max_tokens,
+                    output_config={"effort": CONFIG.effort},
+                    system=SYSTEM_PROMPT,
+                    tools=self.tool_defs,
+                    messages=self.messages,
+                )
+            except Exception as exc:  # noqa: BLE001
+                return self._friendly_error(exc)
 
             # Sicherheits-Ablehnung von Claude Fable 5 abfangen.
             if response.stop_reason == "refusal":
