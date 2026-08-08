@@ -100,6 +100,27 @@ Komponente, schaltet Jarvis automatisch auf einen funktionierenden Fallback um
 (z. B. Enter-Taste statt Wake Word, Text-Eingabe statt Mikrofon), sodass sich das
 System auch Stück für Stück einrichten lässt.
 
+## In VS Code entwickeln
+
+Das Projekt bringt eine fertige `.vscode`-Konfiguration mit.
+
+1. Ordner in VS Code öffnen und die empfohlenen Erweiterungen installieren
+   (Python, Pylance, debugpy – Vorschlag erscheint automatisch).
+2. Umgebung anlegen und Abhängigkeiten installieren – über die Befehlspalette
+   `Tasks: Run Task` → *Jarvis: venv anlegen*, dann *Jarvis: Abhängigkeiten
+   installieren* (oder *Jarvis: Voll-Setup (setup.sh)* für Stimme + YOLO-Modell).
+3. `.env.example` nach `.env` kopieren und den `ANTHROPIC_API_KEY` eintragen –
+   VS Code lädt die Datei bei Start und Debug automatisch.
+4. Interpreter wählen: `Python: Select Interpreter` → `.venv`.
+5. Über **Ausführen und Debuggen** (F5) starten. Verfügbare Konfigurationen:
+   - **Jarvis: GUI starten**
+   - **Jarvis: Konsolenmodus (ohne GUI)**
+   - **Jarvis: Tests (pytest)**
+   - **Python: Aktuelle Datei**
+
+Die Tests laufen auch direkt im Test-Explorer (pytest ist vorkonfiguriert) und
+brauchen weder API-Key noch Netzwerk.
+
 ## Konfiguration
 
 Alle Einstellungen (Modell, Whisper-Größe, Piper-Stimme, Kamera-Index, YOLO-Modell,
