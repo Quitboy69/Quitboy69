@@ -1,20 +1,24 @@
-# Builds the WISP firmware with PlatformIO on every push/PR that touches it.
+# Builds the WISP firmware with PlatformIO and publishes downloadable binaries.
 name: firmware-build
 
 on:
   push:
     paths:
       - "firmware/**"
+      - ".github/workflows/firmware-build.yml"
   pull_request:
     paths:
       - "firmware/**"
+  workflow_dispatch: {}  # allow manual runs from the Actions tab
+
+permissions:
+  contents: write  # needed to publish the release with the binaries
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: firmware
+    env:
+      BUILD_DIR: firmware/.pio/build/heltec_wifi_lora_32_V3
     steps:
       - uses: actions/checkout@v4
 
@@ -30,8 +34,54 @@ jobs:
             firmware/.pio
           key: pio-${{ runner.os }}-${{ hashFiles('firmware/platformio.ini') }}
 
-      - name: Install PlatformIO
-        run: pip install --upgrade platformio
+      - name: Install PlatformIO + esptool
+        run: pip install --upgrade platformio esptool
 
       - name: Build
+        working-directory: firmware
         run: pio run
+
+      - name: Create merged flash image
+        run: |
+          BOOT_APP0=$(find ~/.platformio/packages/framework-arduinoespressif32/tools/partitions -name boot_app0.bin | head -n1)
+          python -m esptool --chip esp32s3 merge_bin \
+            -o "$BUILD_DIR/WISP-heltec_v3-merged.bin" \
+            --flash_mode dio --flash_freq 80m --flash_size 8MB \
+            0x0     "$BUILD_DIR/bootloader.bin" \
+            0x8000  "$BUILD_DIR/partitions.bin" \
+            0xe000  "$BOOT_APP0" \
+            0x10000 "$BUILD_DIR/firmware.bin"
+          cp "$BUILD_DIR/firmware.bin" "$BUILD_DIR/WISP-heltec_v3-app.bin"
+          ls -l "$BUILD_DIR"/*.bin
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wisp-firmware
+          path: |
+            ${{ env.BUILD_DIR }}/WISP-heltec_v3-merged.bin
+            ${{ env.BUILD_DIR }}/WISP-heltec_v3-app.bin
+            ${{ env.BUILD_DIR }}/bootloader.bin
+            ${{ env.BUILD_DIR }}/partitions.bin
+
+      - name: Publish firmware release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: firmware-latest
+          name: WISP firmware (latest build)
+          body: |
+            Automatisch gebautes Firmware-Image für den Heltec WiFi LoRa 32 V3.
+
+            **WISP-heltec_v3-merged.bin** — komplettes Image (Bootloader + Partitionen + App).
+            Flashen an Offset **0x0**. Empfohlen für Web-Flasher.
+
+            **WISP-heltec_v3-app.bin** — nur die Anwendung (Offset 0x10000),
+            falls Bootloader/Partitionen schon auf dem Board sind.
+
+            Commit: ${{ github.sha }}
+          files: |
+            ${{ env.BUILD_DIR }}/WISP-heltec_v3-merged.bin
+            ${{ env.BUILD_DIR }}/WISP-heltec_v3-app.bin
+            ${{ env.BUILD_DIR }}/bootloader.bin
+            ${{ env.BUILD_DIR }}/partitions.bin
