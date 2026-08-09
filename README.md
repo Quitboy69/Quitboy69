@@ -29,6 +29,8 @@ Piper / Kokoro
 | Sprachausgabe           | Piper TTS                                    | `jarvis/speech.py` |
 | Agent (Planung/Reasoning) | Claude Fable 5, Tool-Use                   | `jarvis/agent.py` |
 | Ubuntu-Steuerung        | `terminal`, `browser`, `filesystem`         | `jarvis/tools/` |
+| Merkzettel              | `notes` — persistente Notizen               | `jarvis/tools/notes.py` |
+| Aufräum-Automatik       | `organize` — sortiert Ordner nach Dateityp  | `jarvis/tools/organizer.py` |
 | Kameramodul             | Ultralytics YOLO (YOLOv11) + OpenCV         | `jarvis/vision.py` |
 | GUI                     | PySide6 + PyQtGraph                          | `jarvis/gui/` |
 | Systemdaten             | psutil + nvidia-smi                          | `jarvis/system_stats.py` |
@@ -44,9 +46,40 @@ Ich möchte Firefox öffnen.
 Ausführen? [Ja/Nein]
 ```
 
-Sicherheitskritische Aktionen (Terminal-Befehle, schreibende Dateioperationen)
-werden erst nach Bestätigung ausgeführt. Zusätzlich blockiert eine Blocklist
-zerstörerische Befehle.
+Sicherheitskritische Aktionen (Terminal-Befehle, schreibende Dateioperationen,
+Aufräumen mit `apply=true`) werden erst nach Bestätigung ausgeführt. Zusätzlich
+blockiert eine Blocklist zerstörerische Befehle. Über
+`require_confirmation = False` in `jarvis/config.py` lässt sich die Rückfrage
+bewusst abschalten.
+
+## Notizen & Aufräumen
+
+Zwei Alltags-Werkzeuge, die Jarvis per Stimme nutzt:
+
+- **Notizen**: „Jarvis, merk dir: Milch kaufen“ / „Was habe ich mir gemerkt?“ —
+  gespeichert unter `~/.local/share/jarvis/notes.json`, überlebt Neustarts.
+- **Aufräumen**: „Räum meine Downloads auf“ — sortiert lose Dateien in
+  Unterordner (Bilder, Dokumente, Musik, Videos, Archive, Programme, Sonstiges).
+  Jarvis zeigt erst eine Vorschau und verschiebt erst nach Bestätigung.
+
+Das Aufräumen funktioniert auch ohne Jarvis als eigenständiges Kommando:
+
+```bash
+python -m jarvis.tools.organizer ~/Downloads            # Vorschau
+python -m jarvis.tools.organizer ~/Downloads --apply    # wirklich verschieben
+```
+
+## Projekt-Website (GitHub Pages)
+
+Unter `docs/` liegt eine fertige Landing-Page für das Projekt. Veröffentlichen:
+
+1. GitHub → Repository → **Settings** → **Pages**
+2. Source: *Deploy from a branch*, Branch: `main`, Ordner: `/docs`
+3. Nach kurzer Zeit ist die Seite unter `https://quitboy69.github.io/Quitboy69/` erreichbar.
+
+Die Seite enthält bereits eine „Unterstützen“-Sektion (GitHub-Stern, Sponsoring,
+Einrichtung als Dienstleistung) — Links zu Ko-fi/GitHub Sponsors einfach in
+`docs/index.html` eintragen, sobald vorhanden.
 
 ## GUI
 
