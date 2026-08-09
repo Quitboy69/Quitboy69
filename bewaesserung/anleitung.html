@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Automatische Pflanzenbewässerung – Aufbauanleitung</title>
+<style>
+  @page { size: A4; margin: 14mm 15mm 10mm 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "DejaVu Sans", "Liberation Sans", Arial, Helvetica, sans-serif;
+    font-size: 10.5pt; line-height: 1.5; color: #1c2024; margin: 0;
+  }
+  .page { page-break-after: always; min-height: 250mm; display: flex; flex-direction: column; }
+  .page:last-child { page-break-after: auto; }
+  .foot { margin-top: auto; padding-top: 6mm; border-top: 1px solid #d8dde2;
+          font-size: 8pt; color: #8a949e; display: flex; justify-content: space-between; }
+
+  h1 { font-size: 26pt; line-height: 1.15; margin: 0 0 4mm; color: #12303a; letter-spacing: -0.5px; }
+  h2 { font-size: 16pt; margin: 0 0 1mm; color: #12303a; letter-spacing: -0.3px; }
+  h2 .step { color: #2e8b57; font-weight: 700; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; color: #12303a; }
+  .sub { color: #6b757e; font-size: 10pt; margin: 0 0 5mm; }
+  p { margin: 0 0 3mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.6mm; }
+  strong { color: #10262f; }
+  code { font-family: "DejaVu Sans Mono", "Liberation Mono", monospace; font-size: 9pt;
+         background: #eef2f5; padding: 0.4mm 1.2mm; border-radius: 2px; }
+
+  .box { border: 1px solid #dde3e8; border-radius: 3mm; padding: 4mm 5mm; margin: 0 0 4mm; background: #fbfcfd; }
+  .warn { border: none; border-left: 4px solid #d9822b; background: #fdf5ec; border-radius: 0 3mm 3mm 0;
+          padding: 4mm 5mm; margin: 0 0 4mm; }
+  .warn .t { font-weight: 700; color: #a75f16; display: block; margin-bottom: 1.5mm; }
+  .tip { border: none; border-left: 4px solid #2e8b57; background: #eef7f1; border-radius: 0 3mm 3mm 0;
+         padding: 4mm 5mm; margin: 0 0 4mm; }
+  .tip .t { font-weight: 700; color: #1f6b41; display: block; margin-bottom: 1.5mm; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 9.5pt; }
+  th { text-align: left; background: #12303a; color: #fff; padding: 2mm 3mm; font-weight: 600; font-size: 9pt; }
+  td { padding: 2mm 3mm; border-bottom: 1px solid #e3e8ec; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fa; }
+  .two { display: flex; gap: 6mm; }
+  .two > div { flex: 1; }
+
+  .cover-title { margin-top: 12mm; }
+  .lead { font-size: 12pt; color: #3d4750; line-height: 1.6; }
+  .badge { display: inline-block; background: #12303a; color: #fff; font-size: 8.5pt;
+           padding: 1.2mm 3mm; border-radius: 10mm; letter-spacing: 0.4px; }
+  .toc { list-style: none; padding: 0; margin: 6mm 0 0; font-size: 10.5pt; }
+  .toc li { display: flex; gap: 3mm; padding: 1.1mm 0; border-bottom: 1px dotted #d8dde2; }
+  .toc .n { color: #2e8b57; font-weight: 700; width: 7mm; }
+
+  svg { display: block; width: 100%; height: auto; }
+  .fig { margin: 0 0 4mm; }
+  .cap { font-size: 8.5pt; color: #6b757e; margin-top: 1.5mm; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4mm; font-size: 8.5pt; color: #4a545d; margin-bottom: 3mm; }
+  .legend span { display: flex; align-items: center; gap: 1.5mm; }
+  .sw { width: 7mm; height: 2px; border-radius: 2px; display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- ============ SEITE 1 : COVER ============ -->
+<div class="page">
+  <div class="cover-title">
+    <span class="badge">EINSTEIGER-ANLEITUNG</span>
+    <h1>Automatische<br>Pflanzenbewässerung</h1>
+    <p class="lead">
+      4 Pflanzen, 4 Feuchtigkeitssensoren, 4 Pumpen – gesteuert von einem Arduino.<br>
+      Diese Anleitung erklärt jeden Schritt so, als hättest du noch nie gelötet
+      oder programmiert. Kein Vorwissen nötig.
+    </p>
+  </div>
+
+  <div class="fig" style="margin-top:8mm">
+    <svg viewBox="0 0 660 250" xmlns="http://www.w3.org/2000/svg">
+      <!-- Topf mit Pflanze -->
+      <g transform="translate(30,60)">
+        <path d="M0 60 L12 130 L78 130 L90 60 Z" fill="#e8dcc8" stroke="#c9b795" stroke-width="2"/>
+        <rect x="-4" y="52" width="98" height="12" rx="3" fill="#d9c9ad" stroke="#c9b795" stroke-width="2"/>
+        <path d="M45 52 C45 30 45 18 45 6" stroke="#4a7c3f" stroke-width="4" fill="none"/>
+        <ellipse cx="28" cy="20" rx="17" ry="10" fill="#5d9b4e" transform="rotate(-24 28 20)"/>
+        <ellipse cx="63" cy="24" rx="17" ry="10" fill="#4a7c3f" transform="rotate(22 63 24)"/>
+        <ellipse cx="45" cy="2" rx="15" ry="9" fill="#6cae59"/>
+        <!-- Sensor im Topf -->
+        <rect x="60" y="62" width="9" height="52" rx="2" fill="#1f2328"/>
+        <text x="45" y="150" font-size="11" fill="#4a545d" text-anchor="middle" font-family="sans-serif">Pflanze + Sensor</text>
+      </g>
+
+      <!-- Pfeil 1 -->
+      <g transform="translate(140,120)">
+        <path d="M0 0 L52 0" stroke="#b6c0c8" stroke-width="2.5"/>
+        <path d="M52 0 L44 -5 L44 5 Z" fill="#b6c0c8"/>
+        <text x="26" y="-8" font-size="9.5" fill="#8a949e" text-anchor="middle" font-family="sans-serif">misst</text>
+      </g>
+
+      <!-- Arduino -->
+      <g transform="translate(205,78)">
+        <rect x="0" y="0" width="118" height="86" rx="7" fill="#1b6e7d" stroke="#12505c" stroke-width="2"/>
+        <rect x="8" y="6" width="102" height="7" rx="2" fill="#20272c"/>
+        <rect x="8" y="73" width="102" height="7" rx="2" fill="#20272c"/>
+        <rect x="30" y="30" width="38" height="24" rx="2" fill="#2b3238"/>
+        <circle cx="90" cy="42" r="8" fill="#2b3238"/>
+        <text x="59" y="100" font-size="11" fill="#4a545d" text-anchor="middle" font-family="sans-serif">Arduino entscheidet</text>
+      </g>
+
+      <!-- Pfeil 2 -->
+      <g transform="translate(340,120)">
+        <path d="M0 0 L52 0" stroke="#b6c0c8" stroke-width="2.5"/>
+        <path d="M52 0 L44 -5 L44 5 Z" fill="#b6c0c8"/>
+        <text x="26" y="-8" font-size="9.5" fill="#8a949e" text-anchor="middle" font-family="sans-serif">schaltet</text>
+      </g>
+
+      <!-- Relais -->
+      <g transform="translate(405,82)">
+        <rect x="0" y="0" width="104" height="78" rx="5" fill="#2b5fa8" stroke="#1c4478" stroke-width="2"/>
+        <rect x="9" y="14" width="19" height="34" rx="2" fill="#3f7ac9"/>
+        <rect x="32" y="14" width="19" height="34" rx="2" fill="#3f7ac9"/>
+        <rect x="55" y="14" width="19" height="34" rx="2" fill="#3f7ac9"/>
+        <rect x="78" y="14" width="19" height="34" rx="2" fill="#3f7ac9"/>
+        <rect x="9" y="56" width="88" height="12" rx="2" fill="#2f7d4f"/>
+        <text x="52" y="96" font-size="11" fill="#4a545d" text-anchor="middle" font-family="sans-serif">Relais schaltet Strom</text>
+      </g>
+
+      <!-- Pfeil 3 -->
+      <g transform="translate(525,120)">
+        <path d="M0 0 L48 0" stroke="#b6c0c8" stroke-width="2.5"/>
+        <path d="M48 0 L40 -5 L40 5 Z" fill="#b6c0c8"/>
+        <text x="24" y="-8" font-size="9.5" fill="#8a949e" text-anchor="middle" font-family="sans-serif">treibt</text>
+      </g>
+
+      <!-- Pumpe -->
+      <g transform="translate(588,92)">
+        <rect x="0" y="0" width="34" height="52" rx="6" fill="#f2f4f6" stroke="#b6c0c8" stroke-width="2"/>
+        <circle cx="17" cy="26" r="9" fill="#dfe5ea"/>
+        <path d="M17 52 L17 62" stroke="#c33" stroke-width="2.5"/>
+        <path d="M24 52 L24 62" stroke="#333" stroke-width="2.5"/>
+        <text x="17" y="86" font-size="11" fill="#4a545d" text-anchor="middle" font-family="sans-serif">Pumpe gießt</text>
+      </g>
+    </svg>
+  </div>
+
+  <ul class="toc">
+    <li><span class="n">1</span><span>Was du hast und was noch fehlt</span></li>
+    <li><span class="n">2</span><span>Die Bauteile – was ist was?</span></li>
+    <li><span class="n">3</span><span>Schritt 1: Sensoren anschließen</span></li>
+    <li><span class="n">4</span><span>Schritt 2: Relais anschließen</span></li>
+    <li><span class="n">5</span><span>Schritt 3: Strom und Pumpen</span></li>
+    <li><span class="n">6</span><span>Der komplette Plan + Anschlusstabelle</span></li>
+    <li><span class="n">7</span><span>Software: Programm auf den Arduino laden</span></li>
+    <li><span class="n">8</span><span>Testen in 4 Stufen &amp; Kalibrieren</span></li>
+    <li><span class="n">9</span><span>Wenn etwas nicht geht</span></li>
+  </ul>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 1</span></div>
+</div>
+
+<!-- ============ SEITE 2 : TEILELISTE ============ -->
+<div class="page">
+  <h2><span class="step">1.</span> Was du hast und was noch fehlt</h2>
+  <p class="sub">Die kurze Antwort: Deine zwei Bestellungen reichen fast. Ein Teil fehlt noch.</p>
+
+  <h3>✓ Das hast du schon</h3>
+  <table>
+    <tr><th style="width:32%">Teil</th><th>Wofür</th></tr>
+    <tr><td><strong>4× Feuchtigkeitssensor</strong><br><span style="color:#6b757e">„Capacitive Soil Moisture v2.0"</span></td>
+        <td>Steckt in der Erde und misst, wie feucht sie ist. Einer pro Topf.</td></tr>
+    <tr><td><strong>4-fach Relais-Modul</strong><br><span style="color:#6b757e">blaue Platine</span></td>
+        <td>Ein elektrischer Schalter, den der Arduino bedienen kann. Schaltet die Pumpen ein und aus.</td></tr>
+    <tr><td><strong>4× Mini-Pumpe + Schlauch</strong></td>
+        <td>Liegen im Wasserbehälter und pumpen das Wasser in die Töpfe.</td></tr>
+    <tr><td><strong>Arduino UNO + WiFi</strong><br><span style="color:#6b757e">die zweite Bestellung</span></td>
+        <td>Das „Gehirn". Liest die Sensoren, entscheidet, schaltet die Relais. Das WLAN-Teil brauchst du erst später.</td></tr>
+  </table>
+
+  <h3>✗ Das fehlt noch</h3>
+  <table>
+    <tr><th style="width:32%">Teil</th><th>Warum</th></tr>
+    <tr><td><strong>Netzteil 5 Volt, mind. 2 Ampere</strong><br><span style="color:#6b757e">ca. 8–12 €</span></td>
+        <td><strong>Wichtigster Punkt.</strong> Im Werbebild hängen die Pumpen an 2 AA-Batterien. Die sind nach ein paar Gießvorgängen leer. Nimm ein Steckernetzteil mit Schraubklemme.</td></tr>
+    <tr><td><strong>Steckkabel („Dupont-Kabel")</strong><br><span style="color:#6b757e">ca. 5 €, 40 Stück</span></td>
+        <td>Zum Verbinden. Bei diesen Sets liegen oft zu wenige bei. Nimm die Sorte <em>Buchse–Buchse</em> (beide Enden mit Loch).</td></tr>
+    <tr><td><strong>Wasserbehälter</strong></td>
+        <td>Eimer, Kanister oder große Flasche. Alle 4 Pumpen dürfen in denselben Behälter.</td></tr>
+    <tr><td><strong>USB-Kabel</strong> (Micro-USB)</td>
+        <td>Liegt bei der Arduino-Bestellung bei. Damit lädst du das Programm auf und versorgst den Arduino mit Strom.</td></tr>
+  </table>
+
+  <div class="tip">
+    <span class="t">Nice to have, aber nicht nötig</span>
+    Schrumpfschlauch oder Klarlack, um die Oberseite der Sensoren wasserdicht zu machen – genau dort gehen
+    diese Sensoren nach ein paar Monaten kaputt. Und ein paar Meter extra Silikonschlauch, die beiliegenden
+    Stücke sind oft sehr kurz.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 2</span></div>
+</div>
+
+<!-- ============ SEITE 3 : BAUTEILE ============ -->
+<div class="page">
+  <h2><span class="step">2.</span> Die Bauteile – was ist was?</h2>
+  <p class="sub">Damit du weißt, wovon in den nächsten Schritten die Rede ist.</p>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 150" xmlns="http://www.w3.org/2000/svg">
+      <!-- SENSOR -->
+      <g transform="translate(0,20)">
+        <text x="0" y="0" font-size="12" font-weight="bold" fill="#12303a" font-family="sans-serif">Feuchtigkeitssensor</text>
+        <rect x="60" y="22" width="150" height="30" rx="3" fill="#1f2328"/>
+        <polygon points="210,22 250,37 210,52" fill="#1f2328"/>
+        <text x="135" y="41" font-size="8" fill="#9aa5ad" text-anchor="middle" font-family="sans-serif">Capacitive Soil Moisture v2.0</text>
+        <!-- Stecker links -->
+        <rect x="40" y="26" width="20" height="22" rx="2" fill="#e8e8e8" stroke="#b6c0c8"/>
+        <path d="M40 31 L8 31" stroke="#d13b3b" stroke-width="2.5"/>
+        <path d="M40 37 L8 37" stroke="#2b2b2b" stroke-width="2.5"/>
+        <path d="M40 43 L8 43" stroke="#e0a800" stroke-width="2.5"/>
+        <text x="255" y="41" font-size="8.5" fill="#6b757e" font-family="sans-serif">← dieses Ende kommt in die Erde</text>
+        <text x="60" y="70" font-size="8.5" fill="#6b757e" font-family="sans-serif">3 Kabel: rot = Strom, schwarz = Minus, gelb = der Messwert</text>
+      </g>
+
+      <!-- PUMPE -->
+      <g transform="translate(470,20)">
+        <text x="0" y="0" font-size="12" font-weight="bold" fill="#12303a" font-family="sans-serif">Pumpe</text>
+        <rect x="30" y="16" width="40" height="60" rx="7" fill="#f2f4f6" stroke="#b6c0c8" stroke-width="2"/>
+        <circle cx="50" cy="46" r="11" fill="#dfe5ea"/>
+        <rect x="44" y="4" width="12" height="14" rx="2" fill="#dfe5ea" stroke="#b6c0c8"/>
+        <path d="M44 76 L44 92" stroke="#d13b3b" stroke-width="2.5"/>
+        <path d="M56 76 L56 92" stroke="#2b2b2b" stroke-width="2.5"/>
+        <text x="50" y="104" font-size="8.5" fill="#6b757e" text-anchor="middle" font-family="sans-serif">2 Kabel, kommt ins Wasser</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 218" xmlns="http://www.w3.org/2000/svg">
+      <!-- ARDUINO -->
+      <g transform="translate(0,14)">
+        <text x="0" y="0" font-size="12" font-weight="bold" fill="#12303a" font-family="sans-serif">Arduino (das Gehirn)</text>
+        <rect x="10" y="16" width="250" height="150" rx="9" fill="#1b6e7d" stroke="#12505c" stroke-width="2"/>
+        <!-- obere Stiftleiste -->
+        <rect x="30" y="24" width="215" height="14" rx="2" fill="#20272c"/>
+        <text x="137" y="34" font-size="8" fill="#9aa5ad" text-anchor="middle" font-family="sans-serif">DIGITAL  D13 … D2  D1 D0</text>
+        <!-- untere Stiftleisten -->
+        <rect x="30" y="146" width="95" height="14" rx="2" fill="#20272c"/>
+        <text x="77" y="156" font-size="8" fill="#9aa5ad" text-anchor="middle" font-family="sans-serif">POWER (5V, GND)</text>
+        <rect x="150" y="146" width="95" height="14" rx="2" fill="#20272c"/>
+        <text x="197" y="156" font-size="8" fill="#9aa5ad" text-anchor="middle" font-family="sans-serif">ANALOG A0 … A5</text>
+        <!-- chip -->
+        <rect x="80" y="66" width="90" height="30" rx="2" fill="#2b3238"/>
+        <text x="125" y="86" font-size="8" fill="#8a949e" text-anchor="middle" font-family="sans-serif">ATmega328P</text>
+        <!-- USB -->
+        <rect x="0" y="52" width="22" height="26" rx="3" fill="#c9ced2" stroke="#9aa5ad"/>
+        <text x="34" y="70" font-size="8.5" fill="#dff0f2" font-family="sans-serif">USB</text>
+        <!-- DIP -->
+        <rect x="190" y="66" width="56" height="26" rx="2" fill="#e8d44d"/>
+        <g fill="#2b3238">
+          <rect x="194" y="70" width="4" height="10"/><rect x="201" y="70" width="4" height="10"/>
+          <rect x="208" y="70" width="4" height="10"/><rect x="215" y="70" width="4" height="10"/>
+          <rect x="222" y="70" width="4" height="10"/><rect x="229" y="70" width="4" height="10"/>
+          <rect x="236" y="70" width="4" height="10"/>
+        </g>
+        <text x="218" y="104" font-size="8" fill="#dff0f2" text-anchor="middle" font-family="sans-serif">DIP-Schalter</text>
+        <text x="10" y="184" font-size="8.5" fill="#6b757e" font-family="sans-serif">Oben die Digital-Pins (D2–D13), unten links Strom, unten rechts</text>
+        <text x="10" y="196" font-size="8.5" fill="#6b757e" font-family="sans-serif">die Analog-Pins A0–A5. Mehr brauchst du nicht zu wissen.</text>
+      </g>
+
+      <!-- RELAIS -->
+      <g transform="translate(330,14)">
+        <text x="0" y="0" font-size="12" font-weight="bold" fill="#12303a" font-family="sans-serif">Relais-Modul (der Schalter)</text>
+        <rect x="10" y="16" width="290" height="150" rx="7" fill="#2b5fa8" stroke="#1c4478" stroke-width="2"/>
+        <!-- 4 Relais -->
+        <g fill="#3f7ac9" stroke="#1c4478">
+          <rect x="30" y="40" width="55" height="62" rx="3"/>
+          <rect x="95" y="40" width="55" height="62" rx="3"/>
+          <rect x="160" y="40" width="55" height="62" rx="3"/>
+          <rect x="225" y="40" width="55" height="62" rx="3"/>
+        </g>
+        <!-- Schraubklemmen oben -->
+        <g fill="#2f7d4f" stroke="#1f5c39">
+          <rect x="30" y="20" width="55" height="18" rx="2"/>
+          <rect x="95" y="20" width="55" height="18" rx="2"/>
+          <rect x="160" y="20" width="55" height="18" rx="2"/>
+          <rect x="225" y="20" width="55" height="18" rx="2"/>
+        </g>
+        <text x="155" y="33" font-size="8" fill="#dff0f2" text-anchor="middle" font-family="sans-serif">Schraubklemmen: hier kommen die Pumpen dran</text>
+        <!-- Pin-Leiste unten -->
+        <rect x="30" y="120" width="120" height="16" rx="2" fill="#20272c"/>
+        <text x="90" y="131" font-size="8" fill="#9aa5ad" text-anchor="middle" font-family="sans-serif">GND IN1 IN2 IN3 IN4 VCC</text>
+        <!-- Jumper -->
+        <rect x="230" y="120" width="50" height="16" rx="2" fill="#e8d44d"/>
+        <text x="255" y="131" font-size="7.5" fill="#2b3238" text-anchor="middle" font-family="sans-serif">JD-VCC</text>
+        <text x="10" y="184" font-size="8.5" fill="#6b757e" font-family="sans-serif">Unten die Steuer-Pins (kommen an den Arduino), oben die</text>
+        <text x="10" y="196" font-size="8.5" fill="#6b757e" font-family="sans-serif">Schraubklemmen für den Pumpenstrom. Beides ist getrennt!</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="box">
+    <strong>Was macht ein Relais eigentlich?</strong><br>
+    Stell dir einen Lichtschalter vor, den jemand für dich drückt. Der Arduino selbst kann nur winzige
+    Ströme liefern – zu wenig für eine Pumpe. Er gibt dem Relais ein Signal („mach zu!"), und das Relais
+    verbindet dann die dicken Stromkabel von Netzteil und Pumpe. Du hörst dabei ein deutliches <em>Klick</em>.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 3</span></div>
+</div>
+
+<!-- ============ SEITE 4 : SCHRITT 1 SENSOREN ============ -->
+<div class="page">
+  <h2><span class="step">3.</span> Schritt 1: Sensoren anschließen</h2>
+  <p class="sub">Vier Sensoren, drei Kabel pro Sensor. Zieh den Stecker noch nicht in die Steckdose – wir bauen erst alles zusammen.</p>
+
+  <div class="legend">
+    <span><i class="sw" style="background:#d13b3b"></i> rot = 5 Volt (Plus)</span>
+    <span><i class="sw" style="background:#2b2b2b"></i> schwarz = GND (Minus)</span>
+    <span><i class="sw" style="background:#e0a800"></i> gelb = Messwert</span>
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 235" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+      <!-- Sensor -->
+      <polygon points="42,60 8,77 42,94" fill="#1f2328"/>
+      <rect x="42" y="60" width="168" height="34" rx="4" fill="#1f2328"/>
+      <text x="126" y="81" font-size="9.5" fill="#c8d0d6" text-anchor="middle">Feuchtigkeitssensor</text>
+      <text x="26" y="112" font-size="8.5" fill="#6b757e" text-anchor="middle">in die Erde</text>
+      <rect x="210" y="62" width="16" height="30" rx="2" fill="#e8e8e8" stroke="#b6c0c8"/>
+      <!-- Arduino -->
+      <rect x="420" y="20" width="220" height="192" rx="9" fill="#1b6e7d" stroke="#12505c" stroke-width="2"/>
+      <text x="540" y="48" font-size="12" font-weight="bold" fill="#dff0f2" text-anchor="middle">ARDUINO</text>
+      <g>
+        <rect x="398" y="46" width="46" height="18" rx="3" fill="#fff"/>
+        <text x="421" y="59" font-size="9" fill="#12303a" text-anchor="middle">5V</text>
+        <rect x="398" y="76" width="46" height="18" rx="3" fill="#fff"/>
+        <text x="421" y="89" font-size="9" fill="#12303a" text-anchor="middle">GND</text>
+        <rect x="398" y="116" width="46" height="18" rx="3" fill="#fff"/>
+        <text x="421" y="129" font-size="9" fill="#12303a" text-anchor="middle">A0</text>
+        <rect x="398" y="146" width="46" height="18" rx="3" fill="#c4d9dd"/>
+        <text x="421" y="159" font-size="9" fill="#12303a" text-anchor="middle">A1</text>
+        <rect x="398" y="171" width="46" height="18" rx="3" fill="#c4d9dd"/>
+        <text x="421" y="184" font-size="9" fill="#12303a" text-anchor="middle">A2</text>
+        <rect x="398" y="196" width="46" height="18" rx="3" fill="#c4d9dd"/>
+        <text x="421" y="209" font-size="9" fill="#12303a" text-anchor="middle">A3</text>
+      </g>
+      <!-- Leitungen -->
+      <path d="M226 70 H300 V55 H398" fill="none" stroke="#d13b3b" stroke-width="2.5"/>
+      <path d="M226 78 H322 V85 H398" fill="none" stroke="#2b2b2b" stroke-width="2.5"/>
+      <path d="M226 88 H344 V125 H398" fill="none" stroke="#e0a800" stroke-width="2.5"/>
+      <text x="300" y="42" font-size="8.5" fill="#a02a2a" text-anchor="middle">rot → 5V</text>
+      <text x="392" y="74" font-size="8.5" fill="#2b2b2b" text-anchor="end">schwarz → GND</text>
+      <text x="352" y="140" font-size="8.5" fill="#a07a00">gelb → A0</text>
+      <!-- Hinweisbox -->
+      <rect x="14" y="150" width="360" height="62" rx="5" fill="#eef7f1" stroke="#a8d5bd"/>
+      <text x="30" y="172" font-size="9.5" font-weight="bold" fill="#1f6b41">Die anderen drei Sensoren genauso</text>
+      <text x="30" y="188" font-size="9" fill="#3d4750">Nur das gelbe Kabel wandert weiter: Sensor 2 → A1,</text>
+      <text x="30" y="202" font-size="9" fill="#3d4750">Sensor 3 → A2, Sensor 4 → A3. Rot und Schwarz bleiben gleich.</text>
+    </svg>
+    <div class="cap">Die gelben Kabel gehen einzeln auf A0 bis A3. Rot und Schwarz teilen sich jeweils einen Anschluss.</div>
+  </div>
+
+  <h3>So gehst du vor</h3>
+  <ol>
+    <li>Steck das kleine Kabel mit dem weißen Stecker in jeden Sensor. Es passt nur in einer Richtung.</li>
+    <li><strong>Gelbes Kabel</strong> von Sensor 1 auf den Arduino-Pin <code>A0</code>, Sensor 2 auf <code>A1</code>,
+        Sensor 3 auf <code>A2</code>, Sensor 4 auf <code>A3</code>. Merk dir, welcher Sensor in welchen Topf kommt!</li>
+    <li><strong>Alle roten Kabel</strong> müssen an <code>5V</code>. Am Arduino ist aber nur ein 5V-Pin. Lösung:
+        ein Steckbrett (Breadboard) oder du klemmst die vier Kabelenden zusammen in eine kleine Klemme
+        (z. B. Wago-Klemme aus dem Baumarkt).</li>
+    <li><strong>Alle schwarzen Kabel</strong> genauso an <code>GND</code>. Davon gibt es am Arduino drei Stück,
+        das hilft schon mal.</li>
+  </ol>
+
+  <div class="tip">
+    <span class="t">Sensor richtig eingraben</span>
+    Nur bis zur weißen Linie in die Erde stecken. Die Elektronik oben muss trocken bleiben – sonst ist der
+    Sensor nach wenigen Wochen hin.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 4</span></div>
+</div>
+
+<!-- ============ SEITE 5 : SCHRITT 2 RELAIS ============ -->
+<div class="page">
+  <h2><span class="step">4.</span> Schritt 2: Relais anschließen</h2>
+  <p class="sub">Sechs Kabel zwischen Arduino und Relais-Modul. Das ist die Steuerseite – hier fließt noch kein Pumpenstrom.</p>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+      <!-- Arduino -->
+      <rect x="20" y="20" width="230" height="212" rx="9" fill="#1b6e7d" stroke="#12505c" stroke-width="2"/>
+      <text x="120" y="48" font-size="12" font-weight="bold" fill="#dff0f2" text-anchor="middle">ARDUINO</text>
+      <g>
+        <rect x="228" y="61" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="74" font-size="9" fill="#12303a" text-anchor="middle">D2</text>
+        <rect x="228" y="87" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="100" font-size="9" fill="#12303a" text-anchor="middle">D3</text>
+        <rect x="228" y="113" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="126" font-size="9" fill="#12303a" text-anchor="middle">D4</text>
+        <rect x="228" y="139" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="152" font-size="9" fill="#12303a" text-anchor="middle">D5</text>
+        <rect x="228" y="173" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="186" font-size="9" fill="#12303a" text-anchor="middle">5V</text>
+        <rect x="228" y="199" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="212" font-size="9" fill="#12303a" text-anchor="middle">GND</text>
+      </g>
+      <!-- Relais -->
+      <rect x="410" y="20" width="230" height="212" rx="7" fill="#2b5fa8" stroke="#1c4478" stroke-width="2"/>
+      <text x="540" y="48" font-size="12" font-weight="bold" fill="#dff0f2" text-anchor="middle">RELAIS-MODUL</text>
+      <g fill="#3f7ac9" stroke="#1c4478">
+        <rect x="470" y="118" width="36" height="52" rx="3"/><rect x="512" y="118" width="36" height="52" rx="3"/>
+        <rect x="554" y="118" width="36" height="52" rx="3"/><rect x="596" y="118" width="36" height="52" rx="3"/>
+      </g>
+      <g fill="#2f7d4f" stroke="#1f5c39">
+        <rect x="470" y="62" width="36" height="18" rx="2"/><rect x="512" y="62" width="36" height="18" rx="2"/>
+        <rect x="554" y="62" width="36" height="18" rx="2"/><rect x="596" y="62" width="36" height="18" rx="2"/>
+      </g>
+      <text x="551" y="94" font-size="8" fill="#b9d0ec" text-anchor="middle">Schraubklemmen → Pumpen (Seite 6)</text>
+      <text x="551" y="192" font-size="8" fill="#b9d0ec" text-anchor="middle">die vier Relais</text>
+      <g>
+        <rect x="386" y="61" width="46" height="18" rx="3" fill="#fff"/><text x="409" y="74" font-size="9" fill="#12303a" text-anchor="middle">IN1</text>
+        <rect x="386" y="87" width="46" height="18" rx="3" fill="#fff"/><text x="409" y="100" font-size="9" fill="#12303a" text-anchor="middle">IN2</text>
+        <rect x="386" y="113" width="46" height="18" rx="3" fill="#fff"/><text x="409" y="126" font-size="9" fill="#12303a" text-anchor="middle">IN3</text>
+        <rect x="386" y="139" width="46" height="18" rx="3" fill="#fff"/><text x="409" y="152" font-size="9" fill="#12303a" text-anchor="middle">IN4</text>
+        <rect x="386" y="173" width="46" height="18" rx="3" fill="#fff"/><text x="409" y="186" font-size="9" fill="#12303a" text-anchor="middle">VCC</text>
+        <rect x="386" y="199" width="46" height="18" rx="3" fill="#fff"/><text x="409" y="212" font-size="9" fill="#12303a" text-anchor="middle">GND</text>
+      </g>
+      <!-- Leitungen: gerade durch -->
+      <g stroke-width="2.5" fill="none">
+        <path d="M274 70 H386" stroke="#2f6fd0"/>
+        <path d="M274 96 H386" stroke="#2f6fd0"/>
+        <path d="M274 122 H386" stroke="#2f6fd0"/>
+        <path d="M274 148 H386" stroke="#2f6fd0"/>
+        <path d="M274 182 H386" stroke="#d13b3b"/>
+        <path d="M274 208 H386" stroke="#2b2b2b"/>
+      </g>
+      <text x="330" y="247" font-size="9" fill="#4a545d" text-anchor="middle">6 Kabel, alle geradeaus – nichts kreuzt sich</text>
+    </svg>
+  </div>
+
+  <table>
+    <tr><th style="width:30%">Am Arduino</th><th style="width:30%">Am Relais-Modul</th><th>Bedeutung</th></tr>
+    <tr><td><code>D2</code></td><td><code>IN1</code></td><td>schaltet Pumpe 1</td></tr>
+    <tr><td><code>D3</code></td><td><code>IN2</code></td><td>schaltet Pumpe 2</td></tr>
+    <tr><td><code>D4</code></td><td><code>IN3</code></td><td>schaltet Pumpe 3</td></tr>
+    <tr><td><code>D5</code></td><td><code>IN4</code></td><td>schaltet Pumpe 4</td></tr>
+    <tr><td><code>5V</code></td><td><code>VCC</code></td><td>Strom für die Elektronik des Moduls</td></tr>
+    <tr><td><code>GND</code></td><td><code>GND</code></td><td>gemeinsamer Minuspol</td></tr>
+  </table>
+
+  <div class="box">
+    <strong>Der gelbe Jumper (kleine Steckbrücke)</strong><br>
+    Auf vielen Relais-Modulen sitzt neben den Pins eine kleine Brücke mit der Beschriftung <code>JD-VCC</code>.
+    Lass sie zunächst einfach stecken – dann läuft alles über den Arduino und du kannst in Ruhe testen.
+    Wenn der Arduino später beim Schalten neu startet oder sich seltsam verhält, ziehst du die Brücke ab und
+    verbindest <code>JD-VCC</code> mit dem Plus deines 5-V-Netzteils. Dann kommt der Strom für die Relais
+    aus dem Netzteil statt aus dem Arduino.
+  </div>
+
+  <div class="tip">
+    <span class="t">Merke: LOW heißt AN</span>
+    Diese Module sind fast immer „LOW-aktiv". Im Programm bedeutet <code>digitalWrite(pin, LOW)</code>
+    also <em>Pumpe an</em> und <code>HIGH</code> heißt <em>aus</em>. Klingt verkehrt herum, ist aber normal.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 5</span></div>
+</div>
+
+<!-- ============ SEITE 6 : SCHRITT 3 STROM ============ -->
+<div class="page">
+  <h2><span class="step">5.</span> Schritt 3: Strom und Pumpen</h2>
+  <p class="sub">Der wichtigste Teil – und der, wo die meisten Anfänger scheitern.</p>
+
+  <div class="warn">
+    <span class="t">Die eine Regel, die du dir merken musst</span>
+    <strong>Die Pumpen bekommen ihren Strom vom Netzteil, niemals vom Arduino.</strong>
+    Der Arduino kann so viel Strom gar nicht liefern. Wenn du es trotzdem versuchst, startet er jedes Mal
+    neu, sobald eine Pumpe anläuft – ein Fehler, den man stundenlang sucht.
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 245" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+      <!-- Netzteil -->
+      <rect x="14" y="42" width="112" height="70" rx="6" fill="#2b3238"/>
+      <text x="70" y="68" font-size="10.5" fill="#fff" text-anchor="middle">Netzteil</text>
+      <text x="70" y="86" font-size="10.5" fill="#7fd8a0" text-anchor="middle">5 V / 2 A</text>
+      <rect x="104" y="51" width="40" height="18" rx="3" fill="#fff"/><text x="124" y="64" font-size="9.5" fill="#a02a2a" text-anchor="middle">+</text>
+      <rect x="104" y="85" width="40" height="18" rx="3" fill="#fff"/><text x="124" y="98" font-size="9.5" fill="#12303a" text-anchor="middle">−</text>
+
+      <!-- Relais-Kanal -->
+      <rect x="250" y="26" width="250" height="112" rx="7" fill="#2b5fa8" stroke="#1c4478" stroke-width="2"/>
+      <text x="375" y="50" font-size="11" font-weight="bold" fill="#dff0f2" text-anchor="middle">Relais – Kanal 1</text>
+      <!-- Schaltsymbol -->
+      <circle cx="300" cy="90" r="4" fill="#dff0f2"/>
+      <circle cx="450" cy="90" r="4" fill="#dff0f2"/>
+      <path d="M300 90 L440 70" stroke="#dff0f2" stroke-width="2.5" fill="none"/>
+      <text x="375" y="118" font-size="8.5" fill="#b9d0ec" text-anchor="middle">schließt, wenn der Arduino es sagt</text>
+      <rect x="228" y="81" width="46" height="18" rx="3" fill="#fff"/><text x="251" y="94" font-size="9" fill="#12303a" text-anchor="middle">COM</text>
+      <rect x="476" y="81" width="46" height="18" rx="3" fill="#fff"/><text x="499" y="94" font-size="9" fill="#12303a" text-anchor="middle">NO</text>
+      <rect x="476" y="106" width="46" height="18" rx="3" fill="#c9d6e8"/><text x="499" y="119" font-size="9" fill="#12303a" text-anchor="middle">NC</text>
+      <text x="499" y="136" font-size="8.5" fill="#6b757e" text-anchor="middle">bleibt frei</text>
+
+      <!-- Pumpe -->
+      <rect x="576" y="52" width="70" height="88" rx="8" fill="#f2f4f6" stroke="#b6c0c8" stroke-width="2"/>
+      <circle cx="611" cy="96" r="15" fill="#dfe5ea"/>
+      <text x="611" y="158" font-size="10" fill="#4a545d" text-anchor="middle">Pumpe 1</text>
+      <rect x="554" y="81" width="40" height="18" rx="3" fill="#fff" stroke="#b6c0c8"/><text x="574" y="94" font-size="9" fill="#a02a2a" text-anchor="middle">+</text>
+      <rect x="554" y="112" width="40" height="18" rx="3" fill="#fff" stroke="#b6c0c8"/><text x="574" y="125" font-size="9" fill="#12303a" text-anchor="middle">−</text>
+
+      <!-- Arduino nur GND -->
+      <rect x="255" y="192" width="150" height="46" rx="7" fill="#1b6e7d" stroke="#12505c" stroke-width="2"/>
+      <text x="330" y="221" font-size="10.5" fill="#dff0f2" text-anchor="middle">Arduino</text>
+      <rect x="308" y="183" width="46" height="18" rx="3" fill="#fff"/><text x="331" y="196" font-size="9" fill="#12303a" text-anchor="middle">GND</text>
+
+      <!-- Leitungen -->
+      <path d="M144 60 H196 V90 H228" fill="none" stroke="#d13b3b" stroke-width="2.5"/>
+      <path d="M522 90 H554" fill="none" stroke="#d13b3b" stroke-width="2.5"/>
+      <path d="M554 121 H520 V166 H186 V94 H144" fill="none" stroke="#2b2b2b" stroke-width="2.5"/>
+      <path d="M331 166 V183" fill="none" stroke="#2b2b2b" stroke-width="2.5" stroke-dasharray="5 3"/>
+      <circle cx="331" cy="166" r="4" fill="#2b2b2b"/>
+      <text x="196" y="40" font-size="8.5" fill="#a02a2a" text-anchor="middle">Plus → COM</text>
+      <text x="536" y="74" font-size="8.5" fill="#a02a2a" text-anchor="middle">→ Pumpe +</text>
+      <text x="440" y="160" font-size="8.5" fill="#2b2b2b" text-anchor="middle">Pumpe − zurück zum Netzteil</text>
+      <text x="341" y="180" font-size="8.5" fill="#2b2b2b">gemeinsame Masse</text>
+    </svg>
+    <div class="cap">So wird eine Pumpe angeschlossen. Für Pumpe 2, 3 und 4 machst du exakt dasselbe an Kanal 2, 3 und 4.</div>
+  </div>
+
+  <h3>So gehst du vor</h3>
+  <ol>
+    <li>Plus vom Netzteil an die Klemme <code>COM</code> – bei allen vier Kanälen.</li>
+    <li>Rotes Kabel der Pumpe an <code>NO</code> des zugehörigen Kanals. <code>NC</code> bleibt leer.</li>
+    <li>Schwarzes Kabel der Pumpe direkt zurück an Minus vom Netzteil.</li>
+    <li><strong>Ein zusätzliches schwarzes Kabel</strong> von Netzteil-Minus an einen freien <code>GND</code>-Pin
+        am Arduino. Das nennt sich <em>gemeinsame Masse</em>. Ohne dieses Kabel schaltet gar nichts oder nur zufällig.</li>
+    <li>Den Arduino selbst versorgst du ganz normal über das USB-Kabel – am PC oder an einem Handy-Netzteil.</li>
+  </ol>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 6</span></div>
+</div>
+
+<!-- ============ SEITE 7 : GESAMTPLAN ============ -->
+<div class="page">
+  <h2><span class="step">6.</span> Der komplette Plan</h2>
+  <p class="sub">Alles zusammen auf einen Blick.</p>
+
+  <div class="legend">
+    <span><i class="sw" style="background:#d13b3b"></i> 5 V / Plus</span>
+    <span><i class="sw" style="background:#2b2b2b"></i> GND / Minus</span>
+    <span><i class="sw" style="background:#e0a800"></i> Sensor-Messwert</span>
+    <span><i class="sw" style="background:#2f6fd0"></i> Steuersignal</span>
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 290" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+      <!-- Sensoren -->
+      <rect x="10" y="58" width="118" height="84" rx="7" fill="#1f2328"/>
+      <text x="69" y="90" font-size="10.5" fill="#fff" text-anchor="middle">4 Sensoren</text>
+      <text x="69" y="108" font-size="9" fill="#9aa5ad" text-anchor="middle">in den Töpfen</text>
+      <!-- Arduino -->
+      <rect x="212" y="48" width="140" height="104" rx="8" fill="#1b6e7d" stroke="#12505c" stroke-width="2"/>
+      <text x="282" y="88" font-size="12" font-weight="bold" fill="#dff0f2" text-anchor="middle">ARDUINO</text>
+      <text x="282" y="108" font-size="9" fill="#a9d3d9" text-anchor="middle">misst und entscheidet</text>
+      <!-- Relais -->
+      <rect x="436" y="48" width="130" height="104" rx="7" fill="#2b5fa8" stroke="#1c4478" stroke-width="2"/>
+      <text x="501" y="88" font-size="12" font-weight="bold" fill="#dff0f2" text-anchor="middle">RELAIS</text>
+      <text x="501" y="108" font-size="9" fill="#b9d0ec" text-anchor="middle">4 Kanäle</text>
+      <!-- Pumpen -->
+      <rect x="606" y="58" width="48" height="84" rx="7" fill="#f2f4f6" stroke="#b6c0c8" stroke-width="2"/>
+      <text x="630" y="94" font-size="10" fill="#4a545d" text-anchor="middle">4</text>
+      <text x="630" y="110" font-size="9" fill="#4a545d" text-anchor="middle">Pumpen</text>
+      <!-- Netzteil -->
+      <rect x="212" y="208" width="140" height="58" rx="6" fill="#2b3238"/>
+      <text x="282" y="232" font-size="10.5" fill="#fff" text-anchor="middle">Netzteil</text>
+      <text x="282" y="250" font-size="10.5" fill="#7fd8a0" text-anchor="middle">5 V / 2 A</text>
+
+      <!-- Sensor -> Arduino -->
+      <path d="M128 100 H196" stroke="#e0a800" stroke-width="2.5" fill="none"/>
+      <path d="M204 100 L192 95 L192 105 Z" fill="#e0a800"/>
+      <text x="162" y="90" font-size="8.5" fill="#a07a00" text-anchor="middle">A0–A3</text>
+      <!-- Arduino -> Relais -->
+      <path d="M352 100 H420" stroke="#2f6fd0" stroke-width="2.5" fill="none"/>
+      <path d="M428 100 L416 95 L416 105 Z" fill="#2f6fd0"/>
+      <text x="390" y="90" font-size="8.5" fill="#2456a8" text-anchor="middle">D2–D5</text>
+      <!-- Relais -> Pumpen -->
+      <path d="M566 100 H590" stroke="#d13b3b" stroke-width="2.5" fill="none"/>
+      <path d="M598 100 L586 95 L586 105 Z" fill="#d13b3b"/>
+      <!-- Netzteil -> Relais COM -->
+      <path d="M352 232 H466 V160" stroke="#d13b3b" stroke-width="2.5" fill="none"/>
+      <path d="M466 152 L461 164 L471 164 Z" fill="#d13b3b"/>
+      <text x="362" y="218" font-size="8.5" fill="#a02a2a">Plus an alle COM</text>
+      <!-- Netzteil -> Pumpen Minus -->
+      <path d="M352 252 H630 V150" stroke="#2b2b2b" stroke-width="2.5" fill="none"/>
+      <path d="M630 142 L625 154 L635 154 Z" fill="#2b2b2b"/>
+      <text x="470" y="266" font-size="8.5" fill="#2b2b2b" text-anchor="middle">Minus zurück von allen Pumpen</text>
+      <!-- gemeinsame Masse -->
+      <path d="M252 208 V160" stroke="#2b2b2b" stroke-width="2.5" fill="none" stroke-dasharray="5 3"/>
+      <path d="M252 152 L247 164 L257 164 Z" fill="#2b2b2b"/>
+      <text x="238" y="184" font-size="8.5" fill="#2b2b2b" text-anchor="end">gemeinsame Masse</text>
+      <!-- USB -->
+      <path d="M150 30 H282 V44" stroke="#8a949e" stroke-width="2.5" fill="none"/>
+      <path d="M282 52 L277 40 L287 40 Z" fill="#8a949e"/>
+      <text x="146" y="34" font-size="8.5" fill="#6b757e" text-anchor="end">Strom über USB</text>
+    </svg>
+  </div>
+
+  <h3>Anschlusstabelle zum Abhaken</h3>
+  <table>
+    <tr><th style="width:38%">Von</th><th style="width:32%">Nach</th><th>✓</th></tr>
+    <tr><td>Sensor 1/2/3/4 – gelb</td><td>Arduino A0 / A1 / A2 / A3</td><td>☐</td></tr>
+    <tr><td>Sensor 1–4 – rot</td><td>Arduino 5V (alle zusammen)</td><td>☐</td></tr>
+    <tr><td>Sensor 1–4 – schwarz</td><td>Arduino GND (alle zusammen)</td><td>☐</td></tr>
+    <tr><td>Arduino D2 / D3 / D4 / D5</td><td>Relais IN1 / IN2 / IN3 / IN4</td><td>☐</td></tr>
+    <tr><td>Arduino 5V und GND</td><td>Relais VCC und GND</td><td>☐</td></tr>
+    <tr><td>Netzteil Plus</td><td>COM von Kanal 1–4</td><td>☐</td></tr>
+    <tr><td>Pumpe 1–4 rot</td><td>NO von Kanal 1–4</td><td>☐</td></tr>
+    <tr><td>Pumpe 1–4 schwarz</td><td>Netzteil Minus</td><td>☐</td></tr>
+    <tr><td>Netzteil Minus</td><td>Arduino GND <strong>(gemeinsame Masse!)</strong></td><td>☐</td></tr>
+  </table>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 7</span></div>
+</div>
+
+<!-- ============ SEITE 8 : SOFTWARE ============ -->
+<div class="page">
+  <h2><span class="step">7.</span> Software: Programm auf den Arduino laden</h2>
+  <p class="sub">Einmal einrichten, danach geht das Hochladen mit einem Klick.</p>
+
+  <h3>Einrichtung am PC</h3>
+  <ol>
+    <li><strong>Arduino IDE herunterladen</strong> von <code>arduino.cc/en/software</code> und installieren.
+        Das ist das Programm, in dem du den Code schreibst und auf die Platine schickst.</li>
+    <li><strong>CH340-Treiber installieren.</strong> Deine Platine nutzt einen anderen USB-Chip als das
+        Original – ohne diesen Treiber taucht sie am PC gar nicht auf. Such nach „CH340 Treiber".</li>
+    <li><strong>Arduino per USB anstecken.</strong> In der Arduino IDE oben auswählen:
+        Board = <em>Arduino Uno</em>, Port = der neu erschienene Anschluss
+        (Windows: <code>COM3</code> o. ä., Mac/Linux: <code>/dev/ttyUSB0</code> o. ä.).</li>
+    <li><strong>Testen:</strong> Datei → Beispiele → 01.Basics → <em>Blink</em> öffnen und auf den Pfeil
+        zum Hochladen klicken. Wenn danach eine kleine LED auf der Platine im Sekundentakt blinkt,
+        funktioniert die ganze Kette. Erst dann weitermachen.</li>
+  </ol>
+
+  <div class="warn">
+    <span class="t">Die DIP-Schalter auf deiner Platine</span>
+    Deine Version hat zusätzlich ein WLAN-Modul und dafür eine Reihe winziger Schalter (der gelbe Block).
+    Sie entscheiden, <em>wer</em> gerade am USB-Anschluss hängt. Stehen sie falsch, schlägt das Hochladen fehl.
+    Die passende Tabelle ist meist <strong>hinten auf die Platine gedruckt</strong> oder steht beim Verkäufer
+    in der Artikelbeschreibung – such die Zeile <em>„ATmega328 programmieren"</em>. Mehr brauchst du nicht:
+    das WLAN lässt du erst mal komplett in Ruhe.
+  </div>
+
+  <h3>Wie das Programm arbeitet</h3>
+  <div class="box">
+    Der Arduino wiederholt endlos dieselben paar Schritte – für jeden Topf einzeln:
+    <ol style="margin-top:2mm; margin-bottom:0">
+      <li>Sensor auslesen → ergibt eine Zahl zwischen ungefähr 250 und 650.</li>
+      <li>Ist die Zahl größer als deine Schwelle, ist die Erde zu trocken.</li>
+      <li>Dann: Relais ein, ein paar Sekunden warten, Relais aus.</li>
+      <li>Danach eine längere Pause, damit sich das Wasser verteilen kann.</li>
+      <li>Nächster Topf.</li>
+    </ol>
+  </div>
+
+  <div class="tip">
+    <span class="t">Bei kapazitiven Sensoren gilt: große Zahl = trocken</span>
+    Das verwirrt am Anfang. Der Sensor misst nicht „wie viel Wasser", sondern gibt eine Spannung aus, die
+    bei feuchter Erde <em>sinkt</em>. Hoher Wert heißt also: gießen.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 8</span></div>
+</div>
+
+<!-- ============ SEITE 9 : TESTEN ============ -->
+<div class="page">
+  <h2><span class="step">8.</span> Testen in 4 Stufen &amp; Kalibrieren</h2>
+  <p class="sub">Nicht alles auf einmal anschließen und hoffen. In dieser Reihenfolge findest du Fehler sofort.</p>
+
+  <div class="fig">
+    <svg viewBox="0 0 660 108" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="sans-serif">
+        <g>
+          <rect x="0" y="10" width="150" height="72" rx="6" fill="#eef7f1" stroke="#a8d5bd"/>
+          <circle cx="24" cy="34" r="11" fill="#2e8b57"/>
+          <text x="24" y="38" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">1</text>
+          <text x="42" y="38" font-size="10" fill="#1f6b41" font-weight="bold">Nur Sensoren</text>
+          <text x="12" y="58" font-size="8.5" fill="#3d4750">Werte im Serial Monitor</text>
+          <text x="12" y="70" font-size="8.5" fill="#3d4750">ansehen. Kein Wasser.</text>
+        </g>
+        <path d="M156 46 L166 46" stroke="#b6c0c8" stroke-width="2"/><path d="M166 46 L160 42 L160 50 Z" fill="#b6c0c8"/>
+        <g transform="translate(172,0)">
+          <rect x="0" y="10" width="150" height="72" rx="6" fill="#eef7f1" stroke="#a8d5bd"/>
+          <circle cx="24" cy="34" r="11" fill="#2e8b57"/>
+          <text x="24" y="38" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">2</text>
+          <text x="42" y="38" font-size="10" fill="#1f6b41" font-weight="bold">Relais dazu</text>
+          <text x="12" y="58" font-size="8.5" fill="#3d4750">Ohne Pumpen. Du musst</text>
+          <text x="12" y="70" font-size="8.5" fill="#3d4750">nur das Klicken hören.</text>
+        </g>
+        <path d="M328 46 L338 46" stroke="#b6c0c8" stroke-width="2"/><path d="M338 46 L332 42 L332 50 Z" fill="#b6c0c8"/>
+        <g transform="translate(344,0)">
+          <rect x="0" y="10" width="150" height="72" rx="6" fill="#eef7f1" stroke="#a8d5bd"/>
+          <circle cx="24" cy="34" r="11" fill="#2e8b57"/>
+          <text x="24" y="38" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">3</text>
+          <text x="42" y="38" font-size="10" fill="#1f6b41" font-weight="bold">Pumpen dazu</text>
+          <text x="12" y="58" font-size="8.5" fill="#3d4750">In einen Eimer pumpen,</text>
+          <text x="12" y="70" font-size="8.5" fill="#3d4750">nicht in die Töpfe.</text>
+        </g>
+        <path d="M500 46 L510 46" stroke="#b6c0c8" stroke-width="2"/><path d="M510 46 L504 42 L504 50 Z" fill="#b6c0c8"/>
+        <g transform="translate(516,0)">
+          <rect x="0" y="10" width="144" height="72" rx="6" fill="#eef7f1" stroke="#a8d5bd"/>
+          <circle cx="24" cy="34" r="11" fill="#2e8b57"/>
+          <text x="24" y="38" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">4</text>
+          <text x="42" y="38" font-size="10" fill="#1f6b41" font-weight="bold">Scharf schalten</text>
+          <text x="12" y="58" font-size="8.5" fill="#3d4750">Erst jetzt an die echten</text>
+          <text x="12" y="70" font-size="8.5" fill="#3d4750">Pflanzen. Dabeibleiben!</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <h3>Sensoren kalibrieren – das musst du einmal machen</h3>
+  <p>
+    Jeder Sensor liefert leicht andere Zahlen. Deshalb misst du deine eigenen zwei Eckwerte.
+    Öffne in der Arduino IDE den <strong>Serial Monitor</strong> (Lupensymbol oben rechts), dort laufen die Werte durch.
+  </p>
+  <table>
+    <tr><th style="width:34%">Messung</th><th style="width:26%">Typischer Wert</th><th>Was du tust</th></tr>
+    <tr><td><strong>Trocken</strong></td><td>ca. 550 – 650</td><td>Sensor einfach in die Luft halten. Wert notieren.</td></tr>
+    <tr><td><strong>Nass</strong></td><td>ca. 250 – 350</td><td>Sensor bis zur Linie in ein Glas Wasser stellen. Wert notieren.</td></tr>
+    <tr><td><strong>Schwelle</strong></td><td>Mitte aus beiden</td><td>Beispiel: (600 + 300) ÷ 2 = <strong>450</strong>. Ab 450 aufwärts wird gegossen.</td></tr>
+  </table>
+  <p style="color:#6b757e; font-size:9.5pt">
+    Deine Werte dürfen deutlich abweichen – wichtig ist nur, dass zwischen trocken und nass ein klarer
+    Abstand liegt. Ist der Unterschied kleiner als etwa 100, stimmt etwas mit der Verkabelung nicht.
+  </p>
+
+  <div class="warn">
+    <span class="t">Beim ersten Scharfschalten unbedingt dabeibleiben</span>
+    Setz die Pumpzeit klein an – 3 bis 5 Sekunden – und die Pause danach großzügig, mindestens 30 Minuten.
+    Die Erde braucht Zeit, bis das Wasser beim Sensor ankommt. Ohne Pause pumpt die Anlage sonst
+    einen halben Eimer in einen Topf, weil der Sensor noch „trocken" meldet.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 9</span></div>
+</div>
+
+<!-- ============ SEITE 10 : FEHLERSUCHE ============ -->
+<div class="page">
+  <h2><span class="step">9.</span> Wenn etwas nicht geht</h2>
+  <p class="sub">Die neun häufigsten Probleme – fast immer ist es eines davon.</p>
+
+  <table>
+    <tr><th style="width:40%">Das passiert</th><th>Das ist die Ursache</th></tr>
+    <tr><td>Der PC findet die Platine nicht, es gibt keinen Port zum Auswählen</td>
+        <td>CH340-Treiber fehlt. Oder das USB-Kabel ist ein reines Ladekabel ohne Datenleitungen – ein anderes probieren.</td></tr>
+    <tr><td>Hochladen bricht mit einer Fehlermeldung ab</td>
+        <td>Die DIP-Schalter stehen falsch (siehe Seite 8). Zweithäufigste Ursache: falsches Board oder falscher Port ausgewählt.</td></tr>
+    <tr><td>Die Pumpen laufen sofort los und hören nicht auf</td>
+        <td>Das Relais ist LOW-aktiv. Im Programm <code>HIGH</code> und <code>LOW</code> tauschen.</td></tr>
+    <tr><td>Der Arduino startet neu, sobald eine Pumpe anläuft</td>
+        <td>Die Pumpen hängen am Arduino statt am Netzteil. So gehört es nicht – siehe Seite 6.</td></tr>
+    <tr><td>Die Relais klicken, aber keine Pumpe läuft</td>
+        <td>Netzteil-Minus ist nicht mit Arduino-GND verbunden (gemeinsame Masse fehlt). Oder die Pumpe hängt an <code>NC</code> statt <code>NO</code>.</td></tr>
+    <tr><td>Ein Sensor zeigt immer denselben Wert, egal was du machst</td>
+        <td>Gelbes Kabel steckt nicht richtig oder am falschen Pin. Prüf, ob es wirklich A0–A3 sind.</td></tr>
+    <tr><td>Alle Werte springen wild hin und her</td>
+        <td>Kabel wackeln, oder alle Sensoren hängen an zu wenig Strom. Steckverbindungen nachdrücken.</td></tr>
+    <tr><td>Die Pumpe brummt, aber es kommt kein Wasser</td>
+        <td>Sie liegt nicht tief genug im Wasser oder der Schlauch ist geknickt. Diese Pumpen können nicht ansaugen – sie müssen komplett untergetaucht sein.</td></tr>
+    <tr><td>Nach ein paar Wochen misst ein Sensor Unsinn</td>
+        <td>Feuchtigkeit ist oben in die Elektronik gekrochen. Neuer Sensor – diesmal die Oberseite mit Schrumpfschlauch oder Klarlack abdichten.</td></tr>
+  </table>
+
+  <h3>Drei Sicherheitsregeln</h3>
+  <div class="box">
+    <ul style="margin:0">
+      <li><strong>Nur Kleinspannung.</strong> Alles in diesem Projekt läuft mit 5 Volt. Das ist ungefährlich.
+          Schalte mit diesen Relais als Anfänger nichts, was an der Steckdose hängt.</li>
+      <li><strong>Elektronik über dem Wasser.</strong> Arduino und Relais gehören in eine Box oberhalb des
+          Wasserbehälters – nicht daneben auf den Boden, wo im Zweifel Wasser hinläuft.</li>
+      <li><strong>Pumpen nie trocken laufen lassen.</strong> Sie kühlen sich über das Wasser. Leerer Behälter
+          plus laufende Pumpe = kaputte Pumpe. Deshalb im Programm immer eine maximale Pumpzeit festlegen.</li>
+    </ul>
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 10</span></div>
+</div>
+
+<!-- ============ SEITE 11 : LINKS ============ -->
+<div class="page">
+  <h2>Videos und weiterführende Seiten</h2>
+  <p class="sub">Zum Zuschauen, wenn eine Zeichnung nicht reicht. Und wenn die Anlage später zuverlässig
+  läuft, kannst du das WLAN-Modul dazunehmen – Hauptsache, der Arduino gießt auch dann weiter, wenn das
+  WLAN mal weg ist.</p>
+
+  <h3>Videos auf Deutsch</h3>
+  <table>
+    <tr><th style="width:46%">Video</th><th>Link</th></tr>
+    <tr><td>Automatische Pflanzen-Bewässerung mit Arduino Uno, mit Code</td>
+        <td><code>youtube.com/watch?v=pkD9dVMwrZY</code></td></tr>
+    <tr><td>Relais anschließen – erklärt genau COM / NO / NC</td>
+        <td><code>youtube.com/watch?v=vwGqEpu-g_8</code></td></tr>
+    <tr><td>Arduino: Relais ansteuern – kurz und knapp</td>
+        <td><code>youtube.com/watch?v=mNw55WjbDns</code></td></tr>
+  </table>
+
+  <h3>Schritt-für-Schritt-Seiten auf Deutsch</h3>
+  <table>
+    <tr><th style="width:46%">Seite</th><th>Link</th></tr>
+    <tr><td>Pollux Labs – sehr anfängerfreundlich</td>
+        <td><code>polluxlabs.net/arduino-projekte/automatische-pflanzenbewaesserung/</code></td></tr>
+    <tr><td>e-zubis – Bewässerung mit Arduino</td>
+        <td><code>e-zubis.de/diy-elektronik-hacks/automatische-pflanzenbewaesserung-mit-arduino</code></td></tr>
+    <tr><td>Coding for Tomorrow – inklusive Verkabelung</td>
+        <td><code>coding-for-tomorrow.de/konzepte/smartes-bewasserungssystem-mit-dem-arduino-selber-bauen/</code></td></tr>
+    <tr><td>Newbiely – mit fertigem Code</td>
+        <td><code>newbiely.de/tutorials/arduino/arduino-automatic-irrigation-system</code></td></tr>
+    <tr><td>Last Minute Engineers – der Sensor im Detail <em>(englisch)</em></td>
+        <td><code>lastminuteengineers.com/capacitive-soil-moisture-sensor-arduino/</code></td></tr>
+    <tr><td>Arduino Get Started – Sensor + Pumpe <em>(englisch)</em></td>
+        <td><code>arduinogetstarted.com/tutorials/arduino-soil-moisture-sensor-pump</code></td></tr>
+  </table>
+
+  <div class="tip">
+    <span class="t">Wenn du nicht weiterkommst</span>
+    Im deutschsprachigen Arduino-Forum unter <code>forum.arduino.cc</code> wird Anfängern schnell geholfen –
+    ein Foto vom Aufbau und die Werte aus dem Serial Monitor dazu, dann findet dort meist jemand den Fehler.
+  </div>
+
+  <div class="foot"><span>Automatische Pflanzenbewässerung</span><span>Seite 11</span></div>
+</div>
+
+</body>
+</html>
