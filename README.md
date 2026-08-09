@@ -88,11 +88,32 @@ aktuellen Gedankengang, aktive Tools, den Gesprächsverlauf, den Kamera-Feed und
 Ubuntu-Systemdaten – im Layout aus dem Konzept.
 
 - **🎤-Button (Push-to-Talk)**: einmal zuhören, ohne auf das Wake Word zu
-  warten — praktisch, solange keine Wake-Word-Engine installiert ist.
+  warten — praktisch, solange keine Wake-Word-Engine installiert ist. Fehlt die
+  Spracherkennung, ist der Button ausgegraut und nennt im Tooltip das fehlende Paket.
 - **Kamera-Feed** funktioniert schon mit OpenCV allein
   (`pip install opencv-python`); YOLO ist nur für die Objekterkennung nötig.
 - **Backend-Anzeige** in der Fußzeile: zeigt, welche Engines gerade aktiv
   sind (STT/TTS/Wake/Vision) — steht dort `none`, fehlt das jeweilige Paket.
+- **Fehlt der API-Key**, sagt es die GUI direkt im Gedanken-Panel.
+
+### GUI startet nicht?
+
+Häufigste Ursache auf frischem Ubuntu sind fehlende Qt-Bibliotheken
+(`ImportError: libEGL.so.1: cannot open shared object file`):
+
+```bash
+sudo apt install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 \
+  libdbus-1-3 libfontconfig1 libxrender1 libxi6 libxcb-cursor0 \
+  libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xkb1 \
+  libxcb-randr0 libxcb-render-util0 libxcb-image0
+```
+
+`jarvis/setup.sh` installiert diese Pakete mit und prüft am Ende selbst, ob
+sich die Oberfläche aufbauen lässt. Schnelltest von Hand:
+
+```bash
+QT_QPA_PLATFORM=offscreen python -m pytest jarvis/tests/test_gui.py -v
+```
 
 ```
 ┌──────────────────────────────┐

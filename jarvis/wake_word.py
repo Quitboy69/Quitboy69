@@ -24,9 +24,18 @@ from .config import CONFIG
 
 
 class WakeWordListener:
-    def __init__(self, on_wake: Callable[[], None], keyword: str | None = None) -> None:
+    def __init__(
+        self,
+        on_wake: Callable[[], None],
+        keyword: str | None = None,
+        allow_stdin_fallback: bool = True,
+    ) -> None:
         self.on_wake = on_wake
         self.keyword = keyword or CONFIG.wake_word
+        # Der Enter-Taste-Fallback ergibt nur im Konsolenmodus Sinn. In der GUI
+        # gibt es dafuer den Mikrofon-Button; ein input() im Hintergrund wuerde
+        # dort nur unbemerkt das Terminal belegen.
+        self.allow_stdin_fallback = allow_stdin_fallback
         self._running = False
         self._engine = None
         self._backend = "none"
@@ -53,7 +62,7 @@ class WakeWordListener:
         except Exception:
             pass
 
-        self._backend = "fallback"
+        self._backend = "fallback" if self.allow_stdin_fallback else "aus"
 
     @property
     def backend(self) -> str:
@@ -67,8 +76,9 @@ class WakeWordListener:
         self._running = True
         if self._backend in ("openwakeword", "porcupine"):
             self._listen_with_engine()
-        else:
+        elif self._backend == "fallback":
             self._listen_fallback()
+        # backend == "aus": keine Wake-Word-Erkennung (GUI nutzt den Mikrofon-Button)
 
     # -- Engine-basierte Erkennung --
     def _listen_with_engine(self) -> None:
@@ -76,8 +86,10 @@ class WakeWordListener:
             import numpy as np
             import sounddevice as sd
         except Exception:
-            # Ohne Audio-Stack: Fallback
-            self._listen_fallback()
+            # Ohne Audio-Stack: Fallback (nur wenn erlaubt)
+            self._backend = "fallback" if self.allow_stdin_fallback else "aus"
+            if self.allow_stdin_fallback:
+                self._listen_fallback()
             return
 
         frame = 1280 if self._backend == "openwakeword" else self._engine.frame_length

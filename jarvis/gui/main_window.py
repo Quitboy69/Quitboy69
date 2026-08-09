@@ -282,8 +282,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if frame is None:
             return
         try:
-            import numpy as np
-
             rgb = frame[:, :, ::-1].copy()  # BGR -> RGB
             h, w, ch = rgb.shape
             img = QtGui.QImage(rgb.data, w, h, ch * w, QtGui.QImage.Format_RGB888)

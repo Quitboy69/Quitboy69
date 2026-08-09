@@ -60,15 +60,14 @@ class JarvisCore:
         )
 
         self._mic_active = False
+        self._cam_active = False
         self._running = True
         self._request_q: queue.Queue[str] = queue.Queue()
 
     # ----------------------------------------------------------- Werkzeuge
     def _vision_tool(self) -> str:
-        if self.gui:
-            self.gui.sig_cam.emit(True)
-        description = self.vision.describe_scene()
-        return description
+        self._set_cam(True)
+        return self.vision.describe_scene()
 
     # ---------------------------------------------------------- Callbacks
     def _thought(self, text: str) -> None:
@@ -136,6 +135,14 @@ class JarvisCore:
         if self.gui:
             self.gui.sig_mic.emit(active)
 
+    def _set_cam(self, active: bool) -> None:
+        # Nur bei echtem Wechsel senden, damit die GUI nicht 10x/s neu zeichnet.
+        if active == self._cam_active:
+            return
+        self._cam_active = active
+        if self.gui:
+            self.gui.sig_cam.emit(active)
+
     def _process_loop(self) -> None:
         """Verarbeitet Anfragen seriell (eigener Thread)."""
         while self._running:
@@ -155,7 +162,7 @@ class JarvisCore:
 
     def _stats_loop(self) -> None:
         while self._running:
-            snap = snapshot(mic_active=self._mic_active, cam_active=False)
+            snap = snapshot(mic_active=self._mic_active, cam_active=self._cam_active)
             if self.gui:
                 self.gui.sig_stats.emit(snap.cpu_percent, snap.gpu_percent, snap.ram_percent)
             time.sleep(CONFIG.update_interval_ms / 1000)
@@ -172,14 +179,21 @@ class JarvisCore:
             frame = self.vision.read_frame()
             if frame is not None:
                 self.gui.sig_frame.emit(frame)
-                self.gui.sig_cam.emit(True)
+                self._set_cam(True)
+            else:
+                # Kamera abgezogen oder belegt – Status ehrlich zuruecksetzen.
+                self._set_cam(False)
             time.sleep(0.1)
 
     def start_background(self) -> None:
         threading.Thread(target=self._process_loop, daemon=True).start()
         threading.Thread(target=self._stats_loop, daemon=True).start()
         threading.Thread(target=self._camera_loop, daemon=True).start()
-        self._wake = WakeWordListener(on_wake=self.on_wake)
+        # Der Enter-Taste-Fallback gehoert in den Konsolenmodus; in der GUI
+        # uebernimmt der Mikrofon-Button diese Rolle.
+        self._wake = WakeWordListener(
+            on_wake=self.on_wake, allow_stdin_fallback=self.gui is None
+        )
         self._thought(f"Wake-Word-Backend: {self._wake.backend}")
         threading.Thread(target=self._wake.listen_loop, daemon=True).start()
 
@@ -229,6 +243,13 @@ def run_gui() -> None:
     window.mic_button.clicked.connect(
         lambda: threading.Thread(target=core.listen_once, daemon=True).start()
     )
+
+    # Ohne Spracherkennung waere der Button wirkungslos – lieber sichtbar sperren.
+    if core.stt.backend == "none":
+        window.mic_button.setEnabled(False)
+        window.mic_button.setToolTip(
+            "Spracherkennung nicht installiert: pip install faster-whisper sounddevice numpy"
+        )
 
     window.show()
     core.start_background()
