@@ -166,5 +166,67 @@ def test_filesystem_read_needs_no_confirmation_but_write_does(tmp_path):
     assert confirm_calls, "Schreibende Dateiaktion sollte bestätigt werden"
 
 
+def test_require_confirmation_off_skips_dialog(monkeypatch, tmp_path):
+    """Mit require_confirmation=False läuft alles ohne Rückfrage durch."""
+    from jarvis.config import CONFIG
+
+    monkeypatch.setattr(CONFIG, "require_confirmation", False)
+    marker = tmp_path / "ohne_rueckfrage.txt"
+    scripted = [
+        response("tool_use", [
+            tool_block("t1", "terminal", {"command": f"echo x > {marker}"}),
+        ]),
+        response("end_turn", [text_block("Erledigt.")]),
+    ]
+    confirm_calls: list[str] = []
+    agent = make_agent(scripted, confirm_cb=lambda d: confirm_calls.append(d) or True)
+
+    agent.ask("Lege eine Datei an")
+
+    assert marker.exists()
+    assert confirm_calls == [], "Trotz require_confirmation=False wurde nachgefragt"
+
+
+def test_notes_tool_via_agent(monkeypatch, tmp_path):
+    """Der Agent kann sich über das notes-Tool etwas merken."""
+    import jarvis.tools.notes as notes_mod
+
+    monkeypatch.setattr(notes_mod, "NOTES_FILE", str(tmp_path / "notes.json"))
+    scripted = [
+        response("tool_use", [
+            tool_block("n1", "notes", {"action": "add", "text": "Milch kaufen"}),
+        ]),
+        response("end_turn", [text_block("Ich habe es mir gemerkt.")]),
+    ]
+    agent = make_agent(scripted)
+
+    answer = agent.ask("Merk dir: Milch kaufen")
+
+    assert answer == "Ich habe es mir gemerkt."
+    assert "Milch kaufen" in notes_mod.manage_notes("list", path=str(tmp_path / "notes.json"))
+
+
+def test_organize_preview_needs_no_confirmation_but_apply_does(tmp_path):
+    """Aufräumen: Vorschau läuft direkt, echtes Verschieben erst nach Bestätigung."""
+    (tmp_path / "foto.jpg").write_text("x")
+    scripted = [
+        response("tool_use", [
+            tool_block("o1", "organize", {"path": str(tmp_path)}),
+        ]),
+        response("tool_use", [
+            tool_block("o2", "organize", {"path": str(tmp_path), "apply": True}),
+        ]),
+        response("end_turn", [text_block("Aufgeräumt.")]),
+    ]
+    confirm_calls: list[str] = []
+    agent = make_agent(scripted, confirm_cb=lambda d: confirm_calls.append(d) or True)
+
+    answer = agent.ask("Räum den Ordner auf")
+
+    assert answer == "Aufgeräumt."
+    assert len(confirm_calls) == 1, "Nur apply=true sollte eine Bestätigung erfordern"
+    assert (tmp_path / "Bilder" / "foto.jpg").exists()
+
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-v"]))

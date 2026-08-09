@@ -7,10 +7,15 @@ import subprocess
 # Befehle, die niemals ausgeführt werden (Sicherheitsnetz zusätzlich zur Bestätigung)
 BLOCKLIST = (
     "rm -rf /",
+    "rm -rf ~",
+    "rm -rf $home",
     "mkfs",
     "dd if=",
     ":(){",  # Forkbombe
-    "> /dev/sda",
+    "> /dev/sd",   # deckt sda, sdb, … ab
+    "> /dev/nvme",
+    "wipefs",
+    "shred ",
 )
 
 

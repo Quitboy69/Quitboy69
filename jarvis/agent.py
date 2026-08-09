@@ -23,6 +23,8 @@ Ubuntu-Rechner steuert. Du planst und begründest Aktionen und nutzt Werkzeuge:
 - terminal:   führt Shell-Befehle aus
 - browser:    öffnet URLs oder eine Websuche
 - filesystem: listet, liest, schreibt, verschiebt und löscht Dateien
+- notes:      merkt sich Notizen dauerhaft ("merk dir", "was habe ich notiert")
+- organize:   räumt einen Ordner auf und sortiert Dateien nach Typ
 
 Antworte kurz und natürlich, so wie es vorgelesen werden soll. Vermeide Markdown,
 Aufzählungszeichen und Sonderzeichen in deinen gesprochenen Antworten. Wenn eine
@@ -75,10 +77,53 @@ TOOL_DEFS = [
             "required": ["action", "path"],
         },
     },
+    {
+        "name": "notes",
+        "description": (
+            "Dauerhafter Merkzettel. Nutze dies, wenn der Nutzer sagt 'merk dir …', "
+            "'notier …', 'was habe ich mir gemerkt?' oder eine Notiz löschen will."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["add", "list", "delete", "clear"],
+                    "description": "Die auszuführende Notiz-Aktion",
+                },
+                "text": {"type": "string", "description": "Notiztext für add (optional)"},
+                "number": {"type": "integer", "description": "Nummer der Notiz für delete (optional)"},
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "organize",
+        "description": (
+            "Räumt einen Ordner auf: sortiert lose Dateien in Unterordner wie "
+            "Bilder, Dokumente, Musik, Videos, Archive. Erst mit apply=false eine "
+            "Vorschau zeigen, dann auf Wunsch mit apply=true ausführen."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "Der aufzuräumende Ordner, z. B. ~/Downloads"},
+                "apply": {
+                    "type": "boolean",
+                    "description": "false = nur Vorschau, true = Dateien wirklich verschieben",
+                },
+            },
+            "required": ["path"],
+        },
+    },
 ]
 
 
 def _needs_confirmation(tool_name: str, tool_input: dict) -> bool:
+    if not CONFIG.require_confirmation:
+        return False
+    if tool_name == "organize":
+        return bool(tool_input.get("apply"))  # Vorschau ist unkritisch
     if tool_name in CONFIRM_TOOLS:
         return True
     if tool_name == "filesystem":
@@ -95,6 +140,8 @@ def _describe_action(tool_name: str, tool_input: dict) -> str:
         return f"Ich möchte diese Seite öffnen: {tool_input.get('url', '')}"
     if tool_name == "filesystem":
         return f"Ich möchte '{tool_input.get('action')}' ausführen auf: {tool_input.get('path', '')}"
+    if tool_name == "organize":
+        return f"Ich möchte den Ordner aufräumen und Dateien verschieben: {tool_input.get('path', '')}"
     return f"Ich möchte {tool_name} verwenden."
 
 
