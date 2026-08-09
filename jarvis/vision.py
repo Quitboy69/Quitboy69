@@ -82,6 +82,11 @@ class VisionSystem:
             self._cap = None
         return self._cap
 
+    def camera_available(self) -> bool:
+        """True, wenn eine Kamera geöffnet werden kann — unabhängig von YOLO."""
+        cap = self._open_camera()
+        return cap is not None and cap.isOpened()
+
     def read_frame(self):
         cap = self._open_camera()
         if cap is None or not cap.isOpened():

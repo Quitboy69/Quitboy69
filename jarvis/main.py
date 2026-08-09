@@ -111,6 +111,26 @@ class JarvisCore:
         """Eine Nutzeräußerung in die Verarbeitungsschlange stellen."""
         self._request_q.put(user_text)
 
+    def listen_once(self) -> None:
+        """Push-to-talk: einmal zuhören, ohne auf das Wake Word zu warten.
+
+        Wird vom Mikrofon-Button der GUI genutzt (in eigenem Thread aufrufen).
+        """
+        if self.stt.backend == "none":
+            self._thought(
+                "Keine Spracherkennung verfügbar. Bitte installieren: "
+                "pip install faster-whisper sounddevice numpy"
+            )
+            return
+        self._set_mic(True)
+        self._thought("Ich höre zu …")
+        user_text = self.stt.listen()
+        self._set_mic(False)
+        if not user_text:
+            self._thought("Keine Sprache erkannt.")
+            return
+        self.submit(user_text)
+
     def _set_mic(self, active: bool) -> None:
         self._mic_active = active
         if self.gui:
@@ -141,8 +161,12 @@ class JarvisCore:
             time.sleep(CONFIG.update_interval_ms / 1000)
 
     def _camera_loop(self) -> None:
-        """Zeigt fortlaufend den Kamera-Feed in der GUI (falls verfügbar)."""
-        if not self.gui or self.vision.backend == "none":
+        """Zeigt fortlaufend den Kamera-Feed in der GUI (falls verfügbar).
+
+        Braucht nur OpenCV und eine Kamera — YOLO ist nur für die
+        Objekterkennung nötig, nicht für das Live-Bild.
+        """
+        if not self.gui or not self.vision.camera_available():
             return
         while self._running:
             frame = self.vision.read_frame()
@@ -202,9 +226,21 @@ def run_gui() -> None:
         if window.text_input.text().strip() else None
     )
     window.text_input.returnPressed.connect(window.send_button.click)
+    window.mic_button.clicked.connect(
+        lambda: threading.Thread(target=core.listen_once, daemon=True).start()
+    )
 
     window.show()
     core.start_background()
+    window.backend_label.setText(
+        f"STT: {core.stt.backend} · TTS: {core.tts.backend}"
+        f" · Wake: {core._wake.backend} · Vision: {core.vision.backend}"
+    )
+    if not core.agent.ready:
+        window.sig_thought.emit(
+            "Kein ANTHROPIC_API_KEY gefunden. Kopiere .env.example nach .env "
+            "und trage deinen Schlüssel von console.anthropic.com ein."
+        )
     exit_code = app.exec()
     core.shutdown()
     sys.exit(exit_code)

@@ -183,12 +183,19 @@ class MainWindow(QtWidgets.QMainWindow):
             f"background:#0b0f14; border:1px solid #30363d; border-radius:8px;"
             f" padding:8px; color:{TEXT};"
         )
+        self.mic_button = QtWidgets.QPushButton("🎤")
+        self.mic_button.setToolTip("Einmal zuhören (Push-to-Talk)")
+        self.mic_button.setStyleSheet(
+            f"background:#0b0f14; border:1px solid #30363d; border-radius:8px;"
+            f" padding:8px 12px; color:{TEXT}; font-size:15px;"
+        )
         self.send_button = QtWidgets.QPushButton("Senden")
         self.send_button.setStyleSheet(
             f"background:{ACCENT}; color:#001018; border-radius:8px;"
             f" padding:8px 16px; font-weight:600;"
         )
         input_row.addWidget(self.text_input, stretch=1)
+        input_row.addWidget(self.mic_button)
         input_row.addWidget(self.send_button)
         layout.addLayout(input_row)
         return frame
@@ -204,6 +211,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.cam_badge = StatBadge("Kamera inaktiv")
         layout.addWidget(self.mic_badge)
         layout.addWidget(self.cam_badge)
+
+        self.backend_label = QtWidgets.QLabel("")
+        self.backend_label.setStyleSheet(f"color:{MUTED}; font-size:11px;")
+        layout.addWidget(self.backend_label)
 
         self.cpu_label = QtWidgets.QLabel("CPU 0%")
         self.gpu_label = QtWidgets.QLabel("GPU 0%")

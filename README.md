@@ -85,7 +85,14 @@ Einrichtung als Dienstleistung) — Links zu Ko-fi/GitHub Sponsors einfach in
 
 Die Oberfläche zeigt Mikrofonstatus, Kamerastatus, CPU/GPU-Auslastung, den
 aktuellen Gedankengang, aktive Tools, den Gesprächsverlauf, den Kamera-Feed und
-Ubuntu-Systemdaten – im Layout aus dem Konzept:
+Ubuntu-Systemdaten – im Layout aus dem Konzept.
+
+- **🎤-Button (Push-to-Talk)**: einmal zuhören, ohne auf das Wake Word zu
+  warten — praktisch, solange keine Wake-Word-Engine installiert ist.
+- **Kamera-Feed** funktioniert schon mit OpenCV allein
+  (`pip install opencv-python`); YOLO ist nur für die Objekterkennung nötig.
+- **Backend-Anzeige** in der Fußzeile: zeigt, welche Engines gerade aktiv
+  sind (STT/TTS/Wake/Vision) — steht dort `none`, fehlt das jeweilige Paket.
 
 ```
 ┌──────────────────────────────┐
@@ -110,12 +117,29 @@ pip install -r requirements.txt
 # Optional (Ubuntu-Pakete für Audio):
 sudo apt install portaudio19-dev libportaudio2 xdg-utils
 
-# API-Key für den Agenten:
+# API-Key für den Agenten (siehe Abschnitt "API-Key besorgen"):
+cp ../.env.example ../.env   # und den Schlüssel in .env eintragen
+# oder direkt exportieren:
 export ANTHROPIC_API_KEY="sk-ant-..."
 
 # Piper-Stimme (Deutsch) herunterladen, z. B.:
 #   de_DE-thorsten-medium.onnx  ->  ~/.local/share/piper/
 ```
+
+## API-Key besorgen
+
+Jarvis braucht einen Anthropic-API-Schlüssel für den Agenten:
+
+1. [console.anthropic.com](https://console.anthropic.com) öffnen und einloggen
+   (oder ein Konto anlegen).
+2. Im Menü **API Keys** → **Create Key** wählen.
+3. Den Schlüssel (`sk-ant-…`) kopieren — er wird nur einmal angezeigt.
+4. `.env.example` nach `.env` kopieren und den Schlüssel dort eintragen.
+   Jarvis lädt die `.env` beim Start automatisch; ein `export
+   ANTHROPIC_API_KEY=…` in der Shell hat Vorrang.
+
+Die Nutzung kostet API-Guthaben — unter **Billing** in der Console aufladen
+und den Verbrauch einsehen.
 
 ## Start
 

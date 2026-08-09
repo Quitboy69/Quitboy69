@@ -6,6 +6,35 @@ import os
 from dataclasses import dataclass, field
 
 
+def load_dotenv(path: str | None = None) -> None:
+    """Lädt Variablen aus einer .env-Datei in die Umgebung.
+
+    Ohne Argument wird die .env im Projektstamm gesucht (neben pyproject.toml).
+    Bereits gesetzte Umgebungsvariablen werden nie überschrieben, damit ein
+    `export ANTHROPIC_API_KEY=…` immer Vorrang hat. VS Code lädt die Datei
+    ebenfalls — dieser Loader macht sie auch beim direkten Start wirksam.
+    """
+    if path is None:
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        path = os.path.join(root, ".env")
+    try:
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
+    except OSError:
+        pass
+
+
+load_dotenv()
+
+
 @dataclass
 class Config:
     # --- Agent (Claude Fable 5) ---
