@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><title>Fundamenttest</title></head>
+<body>
+<script src="vendor/three.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/util.js"></script>
+<script src="js/textures.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/world.js"></script>
+<script src="js/audio.js"></script>
+<script>
+/* Baut nur das Fundament auf — ohne die Inhaltsmodule.
+   Prüft, dass Welt, Figuren und Kollision fehlerfrei entstehen. */
+window.TESTRESULT = null;
+(function () {
+  try {
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(800, 450);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    document.body.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    var gfx = GTA.CFG.GFX_LEVELS[2];
+    scene.fog = new THREE.Fog(0xcfe6f5, 180, gfx.fogFar);
+    var camera = new THREE.PerspectiveCamera(66, 800 / 450, 0.1, 3000);
+
+    var ctx = {
+      scene: scene, camera: camera, renderer: renderer, gfx: gfx,
+      obstacles: [], walls: [], worldCars: [], npcs: [], items: [],
+      interiors: [], copCars: [],
+      player: { x: 0, z: 16, heading: 0, speed: 0 },
+      elapsed: 0, heat: 0, activeInterior: null
+    };
+
+    GTA.TEX.init(renderer, gfx);
+    GTA.World.build(ctx);
+    GTA.World.buildVegetation(ctx);
+
+    // Figuren in allen Varianten bauen
+    var builds = Object.keys(GTA.Chars.BUILDS);
+    var hats = GTA.Chars.HATS;
+    var figuren = 0;
+    for (var b = 0; b < builds.length; b++) {
+      for (var h = 0; h < hats.length; h++) {
+        var m = GTA.Chars.makeHuman({
+          build: builds[b], hat: hats[h], hatColor: 0x224466,
+          jacket: (h % 2 === 0), beard: (b % 2 === 0), glasses: (h % 3 === 0),
+          skin: GTA.CFG.SKIN_TONES[b % GTA.CFG.SKIN_TONES.length],
+          hair: GTA.CFG.HAIR_COLORS[h % GTA.CFG.HAIR_COLORS.length]
+        });
+        m.position.set(-40 + b * 3, 0, 40 + h * 3);
+        scene.add(m);
+        GTA.Chars.animate(m, 3.5, 0.016);
+        GTA.Chars.poseSitting(m);
+        figuren++;
+      }
+    }
+
+    // Kollisionsroutinen mit Wänden prüfen
+    GTA.U.addWall(ctx, 10, 10, 6, 0.3, null);
+    GTA.U.addWall(ctx, 10, 10, 0.3, 6, 7);
+    var r1 = GTA.U.resolveAll(ctx, 10, 10.05, 0.5, null);
+    var r2 = GTA.U.resolveAll(ctx, 10, 10.05, 0.5, 7);
+    var frei = GTA.U.isFree(ctx, 300, 300, 1);
+
+    // Ein paar Bilder rendern
+    camera.position.set(18, 6, -28);
+    camera.lookAt(0, 2, 8);
+    for (var f = 0; f < 3; f++) {
+      GTA.World.update(ctx, 0.016);
+      renderer.render(scene, camera);
+    }
+
+    GTA.U.fixMaterials(scene);
+    renderer.render(scene, camera);
+
+    GTA.Audio.init();
+
+    window.TESTRESULT = {
+      ok: true,
+      sceneChildren: scene.children.length,
+      obstacles: ctx.obstacles.length,
+      walls: ctx.walls.length,
+      figuren: figuren,
+      wandAussen: Math.round(r1.z * 1000) / 1000,
+      wandInnen: Math.round(r2.z * 1000) / 1000,
+      wandTrifft: r1.hit,
+      freiWeitDraussen: frei,
+      texturen: Object.keys(GTA.TEX.M).length,
+      renderInfo: renderer.info.render.triangles
+    };
+  } catch (e) {
+    window.TESTRESULT = { ok: false, error: (e && e.stack) ? e.stack : String(e) };
+  }
+})();
+</script>
+</body>
+</html>

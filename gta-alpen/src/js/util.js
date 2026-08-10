@@ -8,17 +8,44 @@ window.GTA = window.GTA || {};
 GTA.U = (function () {
   var U = {};
 
+  // ---------- Farbraum ----------
+  /* three.js r128 rechnet Beleuchtung linear, gibt aber nach sRGB aus.
+     Hexfarben aus dem Quelltext sind sRGB-Werte und müssen deshalb einmal
+     nach linear umgerechnet werden — sonst wird jede Fläche zu hell.
+     Materialien werden markiert, damit sie nicht doppelt umgerechnet werden. */
+  U.fixMaterial = function (m) {
+    if (!m || m.userData.srgbFixed) return m;
+    m.userData.srgbFixed = true;
+    if (m.color && m.color.convertSRGBToLinear) m.color.convertSRGBToLinear();
+    if (m.emissive && m.emissive.convertSRGBToLinear) m.emissive.convertSRGBToLinear();
+    if (m.map && m.map.isTexture && m.map.encoding === THREE.LinearEncoding) {
+      m.map.encoding = THREE.sRGBEncoding;
+      m.map.needsUpdate = true;
+    }
+    return m;
+  };
+
+  /* Nachträglicher Durchlauf für Material, das nicht über U.mat entstanden ist. */
+  U.fixMaterials = function (root) {
+    root.traverse(function (o) {
+      if (!o.material) return;
+      if (Array.isArray(o.material)) o.material.forEach(U.fixMaterial);
+      else U.fixMaterial(o.material);
+    });
+    return root;
+  };
+
   // ---------- Materialien & Primitive ----------
   U.mat = function (color, rough, metal, extra) {
-    return new THREE.MeshStandardMaterial(Object.assign({
+    return U.fixMaterial(new THREE.MeshStandardMaterial(Object.assign({
       color: color,
       roughness: rough === undefined ? 0.8 : rough,
       metalness: metal === undefined ? 0 : metal
-    }, extra || {}));
+    }, extra || {})));
   };
 
   U.basic = function (color, extra) {
-    return new THREE.MeshBasicMaterial(Object.assign({ color: color }, extra || {}));
+    return U.fixMaterial(new THREE.MeshBasicMaterial(Object.assign({ color: color }, extra || {})));
   };
 
   U.box = function (w, h, d, m, shadow) {

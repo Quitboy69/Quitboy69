@@ -18,6 +18,10 @@ GTA.TEX = (function () {
     tx.wrapS = tx.wrapT = THREE.RepeatWrapping;
     tx.repeat.set(repX || 1, repY || 1);
     tx.anisotropy = TEX.maxAniso;
+    // Canvas-Inhalte sind sRGB. Ohne diese Angabe hält three.js sie für
+    // Linearwerte und hellt beim Ausgeben ein zweites Mal auf — alles
+    // wirkt dann ausgewaschen.
+    tx.encoding = THREE.sRGBEncoding;
     return tx;
   }
   TEX.canvasTex = canvasTex;

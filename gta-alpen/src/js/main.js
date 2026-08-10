@@ -8,7 +8,7 @@ window.GTA = window.GTA || {};
 GTA.Game = (function () {
   var G = {};
   var ctx = null;
-  var last = 0, hudT = 0, running = false, started = false;
+  var last = 0, hudT = 0, fixT = 0, running = false, started = false;
 
   /* ---------------- Fehleranzeige ---------------- */
   function fatal(title, err) {
@@ -90,6 +90,9 @@ GTA.Game = (function () {
       if (GTA.Missions && GTA.Missions.build) GTA.Missions.build(ctx);
       if (GTA.UI && GTA.UI.init) GTA.UI.init(ctx);
       GTA.Input.init(ctx);
+
+      // Farbraum aller erzeugten Materialien geraderücken (siehe U.fixMaterial).
+      GTA.U.fixMaterials(ctx.scene);
 
       window.addEventListener('resize', G.onResize);
       G.setupSplash();
@@ -303,6 +306,12 @@ GTA.Game = (function () {
       hudT = 0;
       if (GTA.UI && GTA.UI.updateHud) GTA.UI.updateHud(ctx);
     }
+
+    // Nachzügler beim Farbraum einfangen: alles, was nach dem Aufbau
+    // entsteht (Passanten, Gegenstände, Streifenwagen). Bereits behandelte
+    // Materialien werden übersprungen, der Durchlauf kostet daher fast nichts.
+    fixT += dt;
+    if (fixT > 2) { fixT = 0; GTA.U.fixMaterials(ctx.scene); }
 
     try {
       ctx.renderer.render(ctx.scene, ctx.camera);
