@@ -94,6 +94,12 @@ Die `E`-Taste zeigt unten immer an, was gerade möglich ist — zum Beispiel
 
 ## Was drin ist
 
+Nachgezählt im laufenden Spiel: **27 Fahrzeuge** (davon 10 Zweiräder und Quads),
+**14 Waffen**, **18 Gegenstandstypen**, **12 Aufträge**, **18 verschieden
+eingerichtete Häuser**, **12 Passanten-Typen**. In der Welt gleichzeitig
+unterwegs: rund 46 Leute, 90 Gegenstände, 33 Fahrzeuge.
+
+
 **Welt**
 Dorf mit begehbaren Häusern, Kirche, Tankstelle, Badesee mit Steg und Booten,
 Ringstraße mit Verkehr, Feldwege, Windräder, Berge ringsum.
@@ -166,16 +172,28 @@ gta-alpen/
 │       ├── ui.js          HUD, Garage, Karte
 │       ├── input.js       Tastatur und Maus
 │       └── main.js        Aufbau und Hauptschleife
-└── tools/            Symbol erzeugen, Server, Syntaxprüfung
+└── tools/            Symbol, Server, Syntaxprüfung, Spieltests
 ```
 
 Es gibt keinen Übersetzungsschritt: alle Dateien sind klassische Skripte und
 werden direkt geladen. Nach einer Änderung genügt `F5` im Spielfenster.
 
-Syntaxprüfung aller Module:
+### Prüfen
 
 ```bash
-npm run lint
+npm run lint        # Syntax und verbotene Sprachmittel in allen Modulen
+npm run test:api    # findet Modulfunktionen, die aufgerufen, aber nie definiert werden
+npm test            # startet das Spiel im Browser und meldet Fehler + Bildschirmfotos
+npm run test:spiel  # spielt Einsteigen, Fahren, Haus betreten, Aufheben, Schießen durch
+npm run test:nativ  # startet den Electron-Build und prüft ihn ohne Bildschirm (braucht xvfb)
+```
+
+Der native Selbsttest meldet zum Beispiel:
+
+```
+SELFTEST {"bereit":true,"npcs":46,"items":90,"autos":33,"haeuser":18,
+          "fahrzeuge":27,"waffen":14,"auftraege":12,"calls":770,"gfx":"ULTRA"}
+SELFTEST_FEHLER []
 ```
 
 ---

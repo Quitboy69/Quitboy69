@@ -14,7 +14,12 @@
     "lint": "node tools/check-syntax.js",
     "dist": "electron-builder --linux AppImage deb",
     "dist:deb": "electron-builder --linux deb",
-    "dist:appimage": "electron-builder --linux AppImage"
+    "dist:appimage": "electron-builder --linux AppImage",
+    "test": "node tools/smoke-test.js",
+    "test:api": "node tools/check-api.js",
+    "test:spiel": "node tools/interaction-test.js",
+    "test:nativ": "GTA_SELFTEST=1 xvfb-run -a electron . --no-sandbox",
+    "icon": "node tools/make-icon.js"
   },
   "devDependencies": {
     "electron": "^33.0.0",

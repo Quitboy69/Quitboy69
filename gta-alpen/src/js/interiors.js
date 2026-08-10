@@ -1285,8 +1285,10 @@ GTA.Interiors = (function () {
     var innen = flatM(def.wall, 0.92, 0);
 
     // ---- Boden ----
-    var boden = U.box(w + t * 2, 0.12, d + t * 2, floorM(def.floor), false);
-    boden.position.y = -0.06;
+    // Etwas groesser als der Raum und minimal angehoben — sonst liegt die
+    // Platte exakt auf der Wiese und beide flimmern gegeneinander.
+    var boden = U.box(w + t * 2 + 0.4, 0.12, d + t * 2 + 0.4, floorM(def.floor), false);
+    boden.position.y = -0.045;
     boden.receiveShadow = true;
     group.add(boden);
 
@@ -3304,7 +3306,9 @@ GTA.Interiors = (function () {
     rec.active = on;
     if (rec.furniture) rec.furniture.visible = on;
     for (var i = 0; i < rec.lamps.length; i++) rec.lamps[i].visible = on;
-    if (rec.ceiling) rec.ceiling.visible = !on;
+    // Decke bleibt drinnen sichtbar (sonst schaut man in den Himmel),
+    // nur das Aussendach verschwindet.
+    if (rec.ceiling) rec.ceiling.visible = on;
     if (rec.roofMesh) rec.roofMesh.visible = !on;
   };
 

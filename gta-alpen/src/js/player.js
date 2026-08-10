@@ -495,6 +495,13 @@ GTA.Player = (function () {
       eye = 1.6;
     }
 
+    // Im Haus dichter heran, sonst steht die Kamera in der Wand.
+    var raum = null;
+    if (!inCar && p.interiorId !== null) {
+      raum = P.interiorAt(ctx, p.x, p.z);
+      if (raum) dist = 2.5;
+    }
+
     var pitch = In.lookPitch;
     var cp = Math.cos(pitch), sp = Math.sin(pitch);
     var dirX = Math.sin(camYawSmooth) * cp;
@@ -507,7 +514,14 @@ GTA.Player = (function () {
 
     // Kamera nicht unter den Boden und nicht durchs Dach eines Innenraums
     if (desiredY < 0.7) desiredY = 0.7;
-    if (p.interiorId !== null && desiredY > 2.9) desiredY = 2.9;
+
+    if (raum) {
+      // In den Raum einsperren, damit man nicht durch Wand oder Decke schaut.
+      var rx = raum.w / 2 - 0.55, rz = raum.d / 2 - 0.55;
+      desiredX = GTA.U.clamp(desiredX, raum.x - rx, raum.x + rx);
+      desiredZ = GTA.U.clamp(desiredZ, raum.z - rz, raum.z + rz);
+      if (desiredY > 2.55) desiredY = 2.55;
+    }
 
     var lerp = 1 - Math.exp(-dt * (inCar ? 6.5 : 11));
     camPos.x += (desiredX - camPos.x) * lerp;

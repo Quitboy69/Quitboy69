@@ -71,6 +71,37 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, '..', 'src', 'index.html'));
 
+  // Selbsttest: mit GTA_SELFTEST=1 startet das Spiel, meldet seinen
+  // Zustand auf der Konsole und beendet sich wieder. Damit laesst sich
+  // der native Build pruefen, ohne jemanden davorzusetzen.
+  if (process.env.GTA_SELFTEST === '1') {
+    win.webContents.on('did-finish-load', function () {
+      var fehler = [];
+      win.webContents.on('console-message', function (_e, level, message) {
+        if (level >= 2) fehler.push(message);
+      });
+      setTimeout(function () {
+        win.webContents.executeJavaScript(
+          '(function(){' +
+          ' if(!window.GTA||!GTA.Game||!GTA.Game.getCtx()) return {bereit:false};' +
+          ' var c=GTA.Game.getCtx();' +
+          ' return {bereit:!!c.player, npcs:c.npcs.length, items:c.items.length,' +
+          '  autos:c.worldCars.length, haeuser:c.interiors.length,' +
+          '  fahrzeuge:GTA.Vehicles.CATALOG.length, waffen:GTA.Weapons.CATALOG.length,' +
+          '  auftraege:GTA.Missions.LIST.length, dreiecke:c.renderer.info.render.triangles,' +
+          '  calls:c.renderer.info.render.calls, gfx:c.gfx.name};})()'
+        ).then(function (res) {
+          console.log('SELFTEST ' + JSON.stringify(res));
+          console.log('SELFTEST_FEHLER ' + JSON.stringify(fehler.slice(0, 10)));
+          app.exit(res && res.bereit && fehler.length === 0 ? 0 : 1);
+        }).catch(function (err) {
+          console.log('SELFTEST_ABBRUCH ' + err.message);
+          app.exit(2);
+        });
+      }, 12000);
+    });
+  }
+
   // Externe Links im System-Browser statt im Spielfenster oeffnen.
   win.webContents.setWindowOpenHandler(function (details) {
     shell.openExternal(details.url);
