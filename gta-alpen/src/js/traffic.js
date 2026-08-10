@@ -113,7 +113,21 @@ GTA.Traffic = (function () {
       c.mesh.rotation.y = ph;
       GTA.Player.enterCar(ctx, c);
     } else {
-      c.mesh.position.set(px + Math.sin(ph) * 6, 0, pz + Math.cos(ph) * 6);
+      // Freien Platz rund um den Spieler suchen, damit das neue Fahrzeug
+      // nicht in einer Hauswand oder zwischen Bäumen steht.
+      var r = def.radius + 0.4;
+      var sx = px + Math.sin(ph) * 6, sz = pz + Math.cos(ph) * 6;
+      if (!U.isFree(ctx, sx, sz, r)) {
+        var gefunden = false;
+        for (var ring = 5; ring <= 14 && !gefunden; ring += 3) {
+          for (var k = 0; k < 12; k++) {
+            var a = ph + k * (Math.PI * 2 / 12);
+            var tx = px + Math.sin(a) * ring, tz = pz + Math.cos(a) * ring;
+            if (U.isFree(ctx, tx, tz, r)) { sx = tx; sz = tz; gefunden = true; break; }
+          }
+        }
+      }
+      c.mesh.position.set(sx, 0, sz);
       c.mesh.rotation.y = ph;
     }
     return c;

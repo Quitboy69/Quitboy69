@@ -3214,9 +3214,16 @@ GTA.Interiors = (function () {
     group.rotation.y = rot * HALFPI;
     rec.group = group;
 
-    var R = makeBuilder(ctx, rec, group);
+    // Einrichtung kommt in eine eigene Gruppe. Sie wird nur gezeichnet,
+    // wenn der Spieler wirklich im Haus steht — das spart draussen
+    // mehrere tausend Zeichenaufrufe, weil das Dach sie ohnehin verdeckt.
+    var moebel = new THREE.Group();
+    rec.furniture = moebel;
+    var R = makeBuilder(ctx, rec, moebel);
 
     buildShell(ctx, rec, group, def);
+    group.add(moebel);
+    moebel.visible = false;
 
     var furnish = FURNISH[kind];
     if (furnish) furnish(R);
@@ -3295,6 +3302,7 @@ GTA.Interiors = (function () {
   API.setActive = function (rec, on) {
     if (!rec || rec.active === on) return;
     rec.active = on;
+    if (rec.furniture) rec.furniture.visible = on;
     for (var i = 0; i < rec.lamps.length; i++) rec.lamps[i].visible = on;
     if (rec.ceiling) rec.ceiling.visible = !on;
     if (rec.roofMesh) rec.roofMesh.visible = !on;
@@ -3351,7 +3359,7 @@ GTA.Interiors = (function () {
       if (Math.hypot(x - it.x, z - it.z) > r) continue;
       it.taken = true;
       if (it.mesh) {
-        rec.group.remove(it.mesh);
+        if (it.mesh.parent) it.mesh.parent.remove(it.mesh);
         if (GTA.U && GTA.U.disposeObject) GTA.U.disposeObject(it.mesh);
         it.mesh = null;
       }

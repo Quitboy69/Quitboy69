@@ -8,7 +8,7 @@ window.GTA = window.GTA || {};
 GTA.Game = (function () {
   var G = {};
   var ctx = null;
-  var last = 0, hudT = 0, fixT = 0, running = false, started = false;
+  var last = 0, hudT = 0, fixT = 0, cullT = 0, running = false, started = false;
 
   /* ---------------- Fehleranzeige ---------------- */
   function fatal(title, err) {
@@ -313,11 +313,49 @@ GTA.Game = (function () {
     fixT += dt;
     if (fixT > 2) { fixT = 0; GTA.U.fixMaterials(ctx.scene); }
 
+    cullT += dt;
+    if (cullT > 0.25) { cullT = 0; G.cullDistant(ctx); }
+
     try {
       ctx.renderer.render(ctx.scene, ctx.camera);
     } catch (e) {
       running = false;
       fatal('Fehler beim Zeichnen', e);
+    }
+  };
+
+  /* ============================================================
+     Entfernungs-Ausblendung
+     Figuren, Gegenstände und Fahrzeuge bestehen aus vielen kleinen
+     Teilen. Weit entfernt sind sie ohnehin nur ein paar Bildpunkte
+     gross — dort kosten sie nur Zeichenaufrufe. Das Ausblenden ist
+     der wirksamste Einzelgriff für die Bildrate.
+     ============================================================ */
+  G.cullDistant = function (ctx) {
+    var p = ctx.player;
+    var w = ctx.gfx.fogFar;
+    var dNpc = Math.min(150, w * 0.18);
+    var dItem = Math.min(95, w * 0.11);
+    var dCar = Math.min(260, w * 0.3);
+
+    var i;
+    for (i = 0; i < ctx.npcs.length; i++) {
+      var n = ctx.npcs[i];
+      if (!n.mesh) continue;
+      var dn = Math.abs(n.x - p.x) + Math.abs(n.z - p.z);   // Manhattan reicht hier
+      n.mesh.visible = dn < dNpc;
+    }
+    for (i = 0; i < ctx.items.length; i++) {
+      var it = ctx.items[i];
+      if (!it.mesh || it.taken) continue;
+      var di = Math.abs(it.x - p.x) + Math.abs(it.z - p.z);
+      it.mesh.visible = di < dItem;
+    }
+    for (i = 0; i < ctx.worldCars.length; i++) {
+      var c = ctx.worldCars[i];
+      if (!c.mesh || c === p.car) continue;
+      var dc = Math.abs(c.mesh.position.x - p.x) + Math.abs(c.mesh.position.z - p.z);
+      c.mesh.visible = dc < dCar;
     }
   };
 
