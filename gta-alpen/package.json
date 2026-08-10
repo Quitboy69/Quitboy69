@@ -1,0 +1,64 @@
+{
+  "name": "grand-theft-alpen",
+  "productName": "Grand Theft Alpen",
+  "version": "2.0.0",
+  "description": "Open-World-Spiel im oberösterreichischen Alpenraum — nativer Linux-Desktop-Build",
+  "main": "electron/main.js",
+  "author": "Quitboy69",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "serve": "node tools/serve.js",
+    "lint": "node tools/check-syntax.js",
+    "dist": "electron-builder --linux AppImage deb",
+    "dist:deb": "electron-builder --linux deb",
+    "dist:appimage": "electron-builder --linux AppImage"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "at.quitboy.gtalpen",
+    "productName": "Grand Theft Alpen",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Game",
+      "icon": "build/icon.png",
+      "synopsis": "Open-World-Spiel im Alpenraum",
+      "desktop": {
+        "Name": "Grand Theft Alpen",
+        "Comment": "Open-World-Spiel im oberösterreichischen Alpenraum",
+        "Categories": "Game;ActionGame;"
+      }
+    },
+    "deb": {
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libdrm2",
+        "libgbm1",
+        "libxcb-dri3-0"
+      ]
+    }
+  }
+}

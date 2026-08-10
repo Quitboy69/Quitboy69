@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'">
+<title>Grand Theft Alpen</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== HUD ===================== -->
+<div id="hud">
+
+  <!-- oben links: Fahrzeug, Gesundheit, Ruestung -->
+  <div class="panel" id="hudLeft">
+    <div class="chip" id="hudVehChip"><span id="hudVehDot"></span><span id="hudVehName">Zu Fuß</span></div>
+    <div class="barWrap"><div class="bar"><i id="hudHpFill"></i></div><span class="barIcon">❤</span></div>
+    <div class="barWrap"><div class="bar"><i id="hudArmorFill"></i></div><span class="barIcon">🛡</span></div>
+    <div id="hudHp" class="tiny"></div>
+  </div>
+
+  <!-- oben mitte: Geld, Fahndung, Missionsziel -->
+  <div id="hudCenter">
+    <div id="hudMoney">€ 500</div>
+    <div id="hudWanted"></div>
+    <div id="hudObjective">
+      <span id="hudObjName"></span>
+      <span id="hudObjText"></span>
+    </div>
+  </div>
+
+  <!-- oben rechts: Minimap -->
+  <div id="hudRight">
+    <canvas id="minimap" width="220" height="220"></canvas>
+    <div id="minimapLabel">N</div>
+  </div>
+
+  <!-- unten links: Waffe -->
+  <div class="panel" id="hudWeaponBox">
+    <div id="hudWeaponIcon">👊</div>
+    <div>
+      <div id="hudWeapon">Fäuste</div>
+      <div id="hudAmmo" class="tiny">—</div>
+    </div>
+  </div>
+
+  <!-- unten mitte: Tacho -->
+  <div id="hudSpeedWrap">
+    <div id="hudSpeed">0</div>
+    <div id="hudSpeedUnit">KM/H</div>
+    <div id="hudGearFlag"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- Interaktions-Hinweis -->
+  <div id="prompt"></div>
+
+  <!-- Fadenkreuz beim Zielen -->
+  <div id="crosshair"></div>
+
+  <!-- Sprechblase -->
+  <div id="speech"></div>
+
+  <!-- Schadensblitz -->
+  <div id="hurtFlash"></div>
+</div>
+
+<!-- ===================== Toast ===================== -->
+<div id="toast"></div>
+
+<!-- ===================== Missionsbriefing ===================== -->
+<div id="briefing" class="overlay">
+  <div class="card">
+    <div class="tag">AUFTRAG</div>
+    <h3 id="bName"></h3>
+    <p id="bText"></p>
+    <div class="reward" id="bReward"></div>
+    <div class="btnRow">
+      <button id="bLater" class="btn ghost">Später</button>
+      <button id="bStart" class="btn go">Annehmen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Garage / Shop / Charakter ===================== -->
+<div id="garage" class="overlay">
+  <div class="bigCard">
+    <div class="gHead">
+      <h2>Garage &amp; Ausrüstung</h2>
+      <div id="gMoney">€ 500</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="cars">Fahrzeuge</button>
+      <button class="tab" data-tab="weapons">Waffen</button>
+      <button class="tab" data-tab="char">Charakter</button>
+    </div>
+    <div class="tabBody">
+      <div class="tabPane active" id="gCars"><div id="gCards" class="cardRow"></div></div>
+      <div class="tabPane" id="gWeap"><div id="gWeapons" class="cardRow"></div></div>
+      <div class="tabPane" id="gCharPane"><div id="gChar"></div></div>
+    </div>
+    <button id="closeGarage" class="btn go wide">Weiter</button>
+  </div>
+</div>
+
+<!-- ===================== Pausemenü ===================== -->
+<div id="pauseMenu" class="overlay">
+  <div class="card">
+    <h2>Pause</h2>
+    <div id="pauseRows"></div>
+    <div class="btnRow"><button id="pauseResume" class="btn go wide">Fortsetzen</button></div>
+  </div>
+</div>
+
+<!-- ===================== Große Karte ===================== -->
+<div id="mapOverlay" class="overlay">
+  <div class="bigCard mapCard">
+    <div class="gHead"><h2>Karte — Oberösterreich</h2><div class="tiny">M oder Esc schließt</div></div>
+    <canvas id="mapCanvas" width="760" height="760"></canvas>
+    <div id="mapLegend" class="tiny"></div>
+  </div>
+</div>
+
+<!-- ===================== Startbildschirm ===================== -->
+<div id="splash">
+  <h1>GRAND THEFT<br>ALPEN</h1>
+  <div class="sub">OBERÖSTERREICH EDITION · v2.0 · LINUX</div>
+  <div class="flag"><span></span><span></span><span></span></div>
+  <div id="splashStart" class="btn go big">Spiel starten</div>
+  <div id="splashKeys">
+    <div class="kcol">
+      <div><b>W A S D</b> Bewegen / Fahren</div>
+      <div><b>Maus</b> Umsehen</div>
+      <div><b>Shift</b> Sprinten</div>
+      <div><b>Leertaste</b> Angriff / Schuss</div>
+    </div>
+    <div class="kcol">
+      <div><b>E</b> Einsteigen · Betreten · Reden</div>
+      <div><b>F</b> Aufheben</div>
+      <div><b>R</b> Nachladen</div>
+      <div><b>1…9 / Q</b> Waffe wechseln</div>
+    </div>
+    <div class="kcol">
+      <div><b>M</b> Karte</div>
+      <div><b>G</b> Garage</div>
+      <div><b>F11</b> Vollbild</div>
+      <div><b>Esc</b> Pause</div>
+    </div>
+  </div>
+  <div id="splashNote"></div>
+</div>
+
+<!-- ===================== Ladefehler ===================== -->
+<div id="fatal"></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/util.js"></script>
+<script src="js/textures.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/vehicles.js"></script>
+<script src="js/interiors.js"></script>
+<script src="js/buildings.js"></script>
+<script src="js/world.js"></script>
+<script src="js/traffic.js"></script>
+<script src="js/items.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/npcs.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/player.js"></script>
+<script src="js/missions.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/input.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
