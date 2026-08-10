@@ -1019,7 +1019,788 @@ GTA.Vehicles = (function () {
     return root;
   };
 
-  /* __PART5__ */
+  /* ---------- Traktor ---------- */
+  B.traktor = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var motorblock = U.box(1.05, 0.85, 2.10, p); motorblock.position.set(0, 1.05, 1.35); t.add(motorblock);
+    var kuehlergrill = U.box(0.95, 0.55, 0.14, R.grille); kuehlergrill.position.set(0, 1.00, 2.42); t.add(kuehlergrill);
+    var rumpf = U.box(1.20, 0.70, 1.60, R.dark); rumpf.position.set(0, 0.95, -0.35); t.add(rumpf);
+    var kabine = U.box(1.50, 1.10, 1.45, R.clear); kabine.position.set(0, 2.05, -0.55); t.add(kabine);
+    var kabinendach = U.box(1.70, 0.14, 1.65, p); kabinendach.position.set(0, 2.68, -0.55); t.add(kabinendach);
+    var sitz = U.box(0.5, 0.5, 0.16, R.leather, false); sitz.position.set(0, 1.85, -1.05); t.add(sitz);
+    var lenkrad = U.torus(0.19, 0.03, 6, 14, R.dark, false);
+    lenkrad.rotation.x = 1.0; lenkrad.position.set(0, 1.95, -0.05); t.add(lenkrad);
+    var auspuffrohr = U.cyl(0.07, 0.08, 1.5, 10, R.metal); auspuffrohr.position.set(0.45, 1.9, 2.05); t.add(auspuffrohr);
+    var auspuffkappe = U.cyl(0.10, 0.10, 0.08, 10, R.dark, false); auspuffkappe.position.set(0.45, 2.68, 2.05); t.add(auspuffkappe);
+    var gewicht = U.box(0.9, 0.4, 0.3, R.dark); gewicht.position.set(0, 0.75, 2.60); t.add(gewicht);
+    var hydraulik = U.box(1.0, 0.24, 0.3, R.metal); hydraulik.position.set(0, 0.85, -1.60); t.add(hydraulik);
+    var kupplung = U.cyl(0.08, 0.08, 0.3, 8, R.chrome, false);
+    kupplung.rotation.x = Math.PI / 2; kupplung.position.set(0, 0.75, -1.85); t.add(kupplung);
+
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var kotfluegel = U.box(0.28, 0.4, 1.5, p, false); kotfluegel.position.set(s * 0.86, 1.35, -0.75); t.add(kotfluegel);
+      var arbeitslicht = U.box(0.18, 0.14, 0.12, R.lightF, false);
+      arbeitslicht.position.set(s * 0.5, 2.72, 0.2); t.add(arbeitslicht);
+      root.userData.headlights.push(arbeitslicht);
+      var spiegelarm = U.cyl(0.02, 0.02, 0.5, 6, R.metal, false);
+      spiegelarm.rotation.z = Math.PI / 2 + s * 0.3; spiegelarm.position.set(s * 1.0, 2.4, -0.1); t.add(spiegelarm);
+      var spiegel = U.box(0.06, 0.28, 0.2, R.chrome, false); spiegel.position.set(s * 1.22, 2.35, -0.1); t.add(spiegel);
+    }
+
+    var rundum = U.cyl(0.09, 0.11, 0.16, 10, R.lightA, false);
+    rundum.position.set(-0.6, 2.82, -0.55); t.add(rundum);
+    root.userData.siren = rundum;
+
+    lightPack(root, { hx: 0.42, hy: 1.22, hz: 2.48, hw: 0.24, hh: 0.18,
+                      tx: 0.5, ty: 1.05, tz: -1.72, tw: 0.2, th: 0.2,
+                      pfy: 0.80, pry: 0.72, ps: 0.9 });
+
+    attachWheel(root,  0.78, 0.52, 1.60, 0.52, 0.30, true, 'offroad');
+    attachWheel(root, -0.78, 0.52, 1.60, 0.52, 0.30, true, 'offroad');
+    attachWheel(root,  0.86, 0.92, -0.75, 0.92, 0.46, false, 'traktor');
+    attachWheel(root, -0.86, 0.92, -0.75, 0.92, 0.46, false, 'traktor');
+    return root;
+  };
+
+  /* ---------- Postbus ---------- */
+  B.bus = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paintMatte(color);
+
+    var body = U.box(2.45, 2.10, 9.40, p); body.position.y = 1.65; t.add(body);
+    var dach = U.box(2.30, 0.18, 9.0, R.white, false); dach.position.set(0, 2.76, 0); t.add(dach);
+    var front = U.box(2.40, 0.9, 0.3, p); front.position.set(0, 0.85, 4.62); t.add(front);
+    var wind = U.box(2.20, 1.10, 0.10, R.clear); wind.position.set(0, 2.05, 4.68); t.add(wind);
+    var heckscheibe = U.box(2.10, 0.9, 0.10, R.glass); heckscheibe.position.set(0, 2.10, -4.68); t.add(heckscheibe);
+    var streifen = U.box(2.48, 0.28, 9.2, R.lightA, false); streifen.position.set(0, 1.12, 0); t.add(streifen);
+
+    var i, s, k;
+    for (k = 0; k < 2; k++) {
+      s = k ? -1 : 1;
+      for (i = 0; i < 5; i++) {
+        var fenster = U.box(0.08, 0.85, 1.35, R.glass, false);
+        fenster.position.set(s * 1.24, 2.15, -3.2 + i * 1.62);
+        t.add(fenster);
+      }
+      var tuer = U.box(0.08, 1.6, 1.0, R.glass, false);
+      tuer.position.set(s * 1.24, 1.6, 3.6); t.add(tuer);
+      var stufe = U.box(0.24, 0.1, 1.0, R.metal, false);
+      stufe.position.set(s * 1.24, 0.48, 3.6); t.add(stufe);
+    }
+
+    var gepaeck = U.box(1.9, 0.5, 3.0, R.dark, false); gepaeck.position.set(0, 3.02, -1.0); t.add(gepaeck);
+    var ziel = U.box(1.6, 0.3, 0.06, R.screen ? R.screen : R.dark, false);
+    ziel.position.set(0, 2.62, 4.72); t.add(ziel);
+    var horn = U.cyl(0.08, 0.14, 0.3, 8, R.rimGold, false);
+    horn.rotation.x = Math.PI / 2; horn.position.set(0.9, 2.9, 4.4); t.add(horn);
+
+    addBumper(root, 0.5, 4.75, 2.45, 0.3, R.plastic);
+    addBumper(root, 0.5, -4.75, 2.45, 0.3, R.plastic);
+    addMirrors(root, 1.42, 2.30, 4.35, R.dark);
+    addExhaust(root, -1.0, 0.5, -4.7, 0.08, 0.34, 0, R.metal);
+
+    lightPack(root, { hx: 0.86, hy: 0.92, hz: 4.76, hw: 0.44, hh: 0.26,
+                      tx: 0.92, ty: 1.0, tz: -4.76, tw: 0.36, th: 0.42,
+                      pfy: 0.58, pry: 0.62 });
+
+    attachWheel(root,  1.10, 0.58, 3.20, 0.58, 0.36, true, 'stahl');
+    attachWheel(root, -1.10, 0.58, 3.20, 0.58, 0.36, true, 'stahl');
+    attachWheel(root,  1.10, 0.58, -3.10, 0.58, 0.36, false, 'stahl');
+    attachWheel(root, -1.10, 0.58, -3.10, 0.58, 0.36, false, 'stahl');
+    return root;
+  };
+
+  /* ---------- Holz-LKW ---------- */
+  B.lkw = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paintMatte(color);
+
+    var fahrerhaus = U.box(2.35, 1.85, 2.20, p); fahrerhaus.position.set(0, 1.75, 3.10); t.add(fahrerhaus);
+    var wind = U.box(2.10, 0.90, 0.10, R.clear); wind.position.set(0, 2.20, 4.16); t.add(wind);
+    var haube = U.box(2.20, 0.7, 1.0, p); haube.position.set(0, 1.05, 4.4); t.add(haube);
+    var rahmen = U.box(1.60, 0.34, 8.6, R.dark); rahmen.position.set(0, 0.90, -0.6); t.add(rahmen);
+    var ladeflaeche = U.box(2.40, 0.20, 6.0, R.wood); ladeflaeche.position.set(0, 1.16, -1.6); t.add(ladeflaeche);
+
+    var i, s;
+    for (i = 0; i < 5; i++) {
+      var stamm = U.cyl(0.30, 0.32, 5.4, 10, R.wood);
+      stamm.rotation.x = Math.PI / 2;
+      stamm.position.set(-0.72 + i * 0.36, 1.5 + (i % 2) * 0.5, -1.6);
+      t.add(stamm);
+    }
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var rungeV = U.cyl(0.06, 0.06, 1.4, 8, R.metal); rungeV.position.set(s * 1.16, 1.9, 0.6); t.add(rungeV);
+      var rungeH = rungeV.clone(); rungeH.position.z = -3.8; t.add(rungeH);
+      var tank = U.cyl(0.28, 0.28, 1.2, 12, R.alu); tank.rotation.z = Math.PI / 2;
+      tank.position.set(s * 1.05, 0.85, 1.6); t.add(tank);
+      var kotf = U.box(0.4, 0.2, 1.3, R.plastic, false); kotf.position.set(s * 1.15, 1.3, -2.6); t.add(kotf);
+    }
+
+    var auspuff = U.cyl(0.09, 0.09, 2.4, 10, R.chrome); auspuff.position.set(1.18, 2.0, 2.1); t.add(auspuff);
+    var luftfilter = U.cyl(0.16, 0.16, 1.4, 10, R.metal); luftfilter.position.set(-1.18, 2.3, 2.1); t.add(luftfilter);
+    var dachlampen = U.box(1.6, 0.16, 0.22, R.lightA, false); dachlampen.position.set(0, 2.76, 3.6); t.add(dachlampen);
+    var kuh = U.box(2.2, 0.5, 0.14, R.metal); kuh.position.set(0, 1.0, 4.92); t.add(kuh);
+
+    addGrille(root, 1.6, 4.2, 1.7, 0.6);
+    addBumper(root, 0.6, 4.9, 2.4, 0.34, R.metal);
+    addMirrors(root, 1.42, 2.20, 3.9, R.dark);
+
+    lightPack(root, { hx: 0.82, hy: 1.0, hz: 4.9, hw: 0.42, hh: 0.28,
+                      tx: 0.72, ty: 0.9, tz: -4.3, tw: 0.3, th: 0.34,
+                      pfy: 0.62, pry: 0.56 });
+
+    attachWheel(root,  1.12, 0.62, 3.30, 0.62, 0.40, true, 'stahl');
+    attachWheel(root, -1.12, 0.62, 3.30, 0.62, 0.40, true, 'stahl');
+    attachWheel(root,  1.14, 0.62, -2.20, 0.62, 0.44, false, 'stahl');
+    attachWheel(root, -1.14, 0.62, -2.20, 0.62, 0.44, false, 'stahl');
+    attachWheel(root,  1.14, 0.62, -3.55, 0.62, 0.44, false, 'stahl');
+    attachWheel(root, -1.14, 0.62, -3.55, 0.62, 0.44, false, 'stahl');
+    return root;
+  };
+
+  /* ---------- Militär-Geländewagen ---------- */
+  B.militaer = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paintMatte(color === undefined ? 0x4a5540 : color);
+
+    var wanne = U.box(2.30, 0.95, 4.70, p); wanne.position.y = 1.05; t.add(wanne);
+    var motorhaube = U.box(2.10, 0.45, 1.30, p); motorhaube.position.set(0, 1.62, 1.75); t.add(motorhaube);
+    var wind = U.box(1.90, 0.55, 0.10, R.clear); wind.position.set(0, 1.95, 1.05); wind.rotation.x = -0.22; t.add(wind);
+    var buegelDach = U.box(1.95, 0.10, 2.4, R.cloth); buegelDach.position.set(0, 2.30, -0.6); t.add(buegelDach);
+    var schnorchel = U.cyl(0.09, 0.09, 2.0, 10, R.dark); schnorchel.position.set(1.06, 1.95, 1.3); t.add(schnorchel);
+    var seilwinde = U.cyl(0.14, 0.14, 0.7, 10, R.metal); seilwinde.rotation.z = Math.PI / 2;
+    seilwinde.position.set(0, 0.85, 2.50); t.add(seilwinde);
+    var reserverad = makeWheel(0.52, 0.34, 'offroad');
+    reserverad.rotation.y = Math.PI / 2; reserverad.position.set(0, 1.35, -2.50); t.add(reserverad);
+    var kanister2 = U.box(0.24, 0.5, 0.34, R.dark); kanister2.position.set(-1.0, 1.7, -1.9); t.add(kanister2);
+
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var buegel = U.cyl(0.06, 0.06, 1.2, 8, R.dark); buegel.position.set(s * 0.95, 1.75, -1.75); t.add(buegel);
+      var buegelV = U.cyl(0.06, 0.06, 1.0, 8, R.dark); buegelV.position.set(s * 0.95, 1.85, 0.6); t.add(buegelV);
+      var stufe = U.box(0.26, 0.1, 1.4, R.metal, false); stufe.position.set(s * 1.2, 0.72, -0.2); t.add(stufe);
+      var radlauf = U.box(0.16, 0.24, 1.3, R.dark, false); radlauf.position.set(s * 1.16, 1.0, 1.5); t.add(radlauf);
+      var radlaufH = radlauf.clone(); radlaufH.position.z = -1.5; t.add(radlaufH);
+    }
+
+    var netz = U.box(1.9, 0.14, 1.2, R.cloth, false); netz.position.set(0, 1.6, -1.9); t.add(netz);
+    var antenne2 = U.cyl(0.014, 0.014, 1.6, 6, R.dark, false);
+    antenne2.position.set(-1.05, 2.2, -1.2); antenne2.rotation.z = 0.12; t.add(antenne2);
+
+    addGrille(root, 1.55, 2.42, 1.4, 0.4);
+    addBumper(root, 0.7, 2.52, 2.3, 0.3, R.dark);
+    addBumper(root, 0.7, -2.52, 2.3, 0.3, R.dark);
+    addMirrors(root, 1.22, 1.95, 1.35, R.dark);
+    addExhaust(root, -0.9, 0.6, -2.5, 0.07, 0.32, 0, R.metal);
+
+    lightPack(root, { hx: 0.74, hy: 1.62, hz: 2.44, hh: 0.18, round: true,
+                      tx: 0.84, ty: 1.30, tz: -2.44, tw: 0.24, th: 0.24,
+                      pfy: 1.10, pry: 0.96 });
+
+    axles(root, { x: 1.06, y: 0.56, z: 1.55, r: 0.56, w: 0.42, style: 'offroad' });
+    return root;
+  };
+
+  /* ---------- Streifenwagen (nicht kaufbar) ---------- */
+  B.streifenwagen = function (color) {
+    var root = B.kombi(color === undefined ? 0xf2f4f6 : color);
+    var t = root.userData.tilt;
+
+    var streifen = U.box(2.00, 0.24, 2.90, U.mat(0x1a55a8, 0.6, 0.1), false);
+    streifen.position.set(0, 0.64, 0); t.add(streifen);
+    var balken = U.box(1.16, 0.16, 0.36, R.dark);
+    balken.position.set(0, 1.54, 0.10); t.add(balken);
+    var blauL = U.box(0.46, 0.14, 0.32, R.lightBlue, false);
+    blauL.position.set(0.34, 1.56, 0.10); t.add(blauL);
+    var blauR = U.box(0.46, 0.14, 0.32, R.lightBlue, false);
+    blauR.position.set(-0.34, 1.56, 0.10); t.add(blauR);
+    var schrift = U.box(0.02, 0.16, 1.2, R.dark, false);
+    schrift.position.set(1.00, 0.98, -0.3); t.add(schrift);
+    var schrift2 = schrift.clone(); schrift2.position.x = -1.00; t.add(schrift2);
+    var suchscheinwerfer = U.cyl(0.09, 0.09, 0.12, 10, R.lightW, false);
+    suchscheinwerfer.rotation.x = Math.PI / 2; suchscheinwerfer.position.set(0.72, 1.32, 0.95); t.add(suchscheinwerfer);
+
+    root.userData.siren = balken;
+    root.userData.sirenLights = [blauL, blauR];
+    return root;
+  };
+
+  /* ==========================================================
+     KAROSSERIEN — ZWEIRÄDER (alle mit sichtbarem Fahrer)
+     ========================================================== */
+
+  // Gabel + Schutzblech, von mehreren Zweirädern genutzt
+  function addFork(root, x, y, z, len, neigung, m, r) {
+    var t = root.userData.tilt, i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var holm = U.cyl(r === undefined ? 0.035 : r, r === undefined ? 0.035 : r, len, 8, m || R.chrome);
+      holm.position.set(s * x, y, z);
+      holm.rotation.x = neigung;
+      t.add(holm);
+    }
+  }
+
+  function addFender(root, y, z, w, r, m, ang) {
+    var f = new THREE.Mesh(
+      new THREE.CylinderGeometry(r, r, w, 14, 1, true, ang === undefined ? -0.9 : ang, 1.8),
+      m || R.dark
+    );
+    f.rotation.z = Math.PI / 2;
+    f.position.set(0, y, z);
+    f.castShadow = true;
+    root.userData.tilt.add(f);
+    return f;
+  }
+
+  /* ---------- E-Mountainbike ---------- */
+  B.fahrrad = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var oberrohr = U.cyl(0.026, 0.026, 0.86, 8, p); oberrohr.rotation.x = Math.PI / 2 - 0.12;
+    oberrohr.position.set(0, 0.92, 0.06); t.add(oberrohr);
+    var unterrohr = U.cyl(0.03, 0.03, 0.92, 8, p); unterrohr.rotation.x = Math.PI / 2 + 0.55;
+    unterrohr.position.set(0, 0.66, 0.22); t.add(unterrohr);
+    var sitzrohr = U.cyl(0.025, 0.025, 0.6, 8, p); sitzrohr.rotation.x = -0.22;
+    sitzrohr.position.set(0, 0.82, -0.32); t.add(sitzrohr);
+    var kettenstrebe = U.cyl(0.02, 0.02, 0.6, 6, p); kettenstrebe.rotation.x = Math.PI / 2 - 0.1;
+    kettenstrebe.position.set(0, 0.42, -0.34); t.add(kettenstrebe);
+    var sitzstrebe = U.cyl(0.018, 0.018, 0.62, 6, p); sitzstrebe.rotation.x = 0.5;
+    sitzstrebe.position.set(0, 0.72, -0.46); t.add(sitzstrebe);
+
+    var motor = U.box(0.16, 0.2, 0.26, R.dark); motor.position.set(0, 0.44, -0.02); t.add(motor);
+    var akku = U.box(0.1, 0.14, 0.62, R.dark); akku.position.set(0, 0.68, 0.2); akku.rotation.x = 0.55; t.add(akku);
+    var display = U.box(0.1, 0.03, 0.07, R.chrome, false); display.position.set(0, 1.12, 0.42); t.add(display);
+
+    var sattel = U.box(0.12, 0.07, 0.32, R.dark); sattel.position.set(0, 1.06, -0.4); t.add(sattel);
+    var kurbel = U.cyl(0.11, 0.11, 0.02, 12, R.metal, false); kurbel.rotation.z = Math.PI / 2;
+    kurbel.position.set(0.06, 0.44, -0.02); t.add(kurbel);
+    var pedalL = U.box(0.07, 0.03, 0.15, R.dark, false); pedalL.position.set(0.16, 0.36, 0.05); t.add(pedalL);
+    var pedalR = U.box(0.07, 0.03, 0.15, R.dark, false); pedalR.position.set(-0.16, 0.52, -0.09); t.add(pedalR);
+
+    addFork(root, 0.08, 0.52, 0.58, 0.72, 0.24, R.metal, 0.022);
+    addBars(root, 1.14, 0.42, 0.6, R.dark);
+    addFender(root, 0.82, 0.62, 0.07, 0.4, R.dark);
+    addFender(root, 0.78, -0.62, 0.07, 0.4, R.dark);
+
+    var lampe = U.cyl(0.05, 0.05, 0.05, 10, R.lightF, false);
+    lampe.rotation.x = Math.PI / 2; lampe.position.set(0, 0.92, 0.66); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var ruecklicht = U.box(0.06, 0.05, 0.03, R.lightR, false);
+    ruecklicht.position.set(0, 0.9, -0.72); t.add(ruecklicht);
+    root.userData.tailLights.push(ruecklicht);
+    var traeger = U.box(0.22, 0.03, 0.34, R.metal, false); traeger.position.set(0, 0.94, -0.62); t.add(traeger);
+    var korb = U.box(0.26, 0.16, 0.3, R.wood, false); korb.position.set(0, 1.05, -0.62); t.add(korb);
+
+    addRider(root, { suit: 0x2f6f4a, helmet: 0xe0e4e8, lean: 0.45, y: 1.02, z: -0.12 });
+
+    attachWheel(root, 0, 0.36, 0.60, 0.36, 0.06, true, 'speiche');
+    attachWheel(root, 0, 0.36, -0.62, 0.36, 0.06, false, 'speiche');
+    return root;
+  };
+
+  /* ---------- Moped (Zweitakter) ---------- */
+  B.moped = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.cyl(0.04, 0.04, 0.9, 8, p); rahmen.rotation.x = Math.PI / 2 + 0.35;
+    rahmen.position.set(0, 0.6, 0.16); t.add(rahmen);
+    var tank = U.box(0.2, 0.2, 0.5, p); tank.position.set(0, 0.82, 0.1); t.add(tank);
+    var tankdeckel = U.cyl(0.05, 0.05, 0.04, 8, R.chrome, false); tankdeckel.position.set(0, 0.93, 0.16); t.add(tankdeckel);
+    var motor = U.box(0.22, 0.24, 0.3, R.metal); motor.position.set(0, 0.44, -0.06); t.add(motor);
+    var zylinder = U.cyl(0.07, 0.07, 0.18, 8, R.alu); zylinder.rotation.x = 0.9;
+    zylinder.position.set(0, 0.58, 0.06); t.add(zylinder);
+    var sattel = U.box(0.24, 0.1, 0.46, R.dark); sattel.position.set(0, 0.84, -0.38); t.add(sattel);
+    var gepaecktraeger = U.box(0.24, 0.03, 0.3, R.chrome, false); gepaecktraeger.position.set(0, 0.92, -0.7); t.add(gepaecktraeger);
+    var kette = U.box(0.03, 0.06, 0.5, R.dark, false); kette.position.set(0.1, 0.4, -0.3); t.add(kette);
+    var staender = U.cyl(0.018, 0.018, 0.3, 6, R.metal, false);
+    staender.rotation.x = 0.4; staender.position.set(-0.12, 0.2, -0.16); t.add(staender);
+    var pedale = U.box(0.44, 0.03, 0.08, R.dark, false); pedale.position.set(0, 0.34, -0.02); t.add(pedale);
+
+    addExhaust(root, 0.14, 0.32, -0.44, 0.045, 0.7, 0.1, R.chrome);
+    addFork(root, 0.07, 0.56, 0.6, 0.6, 0.3, R.chrome, 0.022);
+    addBars(root, 1.0, 0.46, 0.62, R.chrome);
+    addFender(root, 0.78, 0.62, 0.09, 0.36, p);
+    addFender(root, 0.74, -0.64, 0.09, 0.34, p);
+
+    var lampe = U.cyl(0.08, 0.08, 0.08, 12, R.lightF, false);
+    lampe.rotation.x = Math.PI / 2; lampe.position.set(0, 0.88, 0.66); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var rueck = U.box(0.09, 0.07, 0.04, R.lightR, false); rueck.position.set(0, 0.86, -0.78); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    var blinkL = U.sph(0.035, 8, 6, R.lightA, false); blinkL.position.set(0.2, 0.88, 0.62); t.add(blinkL);
+    root.userData.blinkers.push(blinkL);
+    var blinkR = U.sph(0.035, 8, 6, R.lightA, false); blinkR.position.set(-0.2, 0.88, 0.62); t.add(blinkR);
+    root.userData.blinkers.push(blinkR);
+    addPlate(root, 0, 0.7, -0.82, Math.PI, 0.5);
+
+    addRider(root, { suit: 0x394050, helmet: 0xd94f4f, lean: 0.2, y: 1.0, z: -0.16 });
+
+    attachWheel(root, 0, 0.32, 0.62, 0.32, 0.09, true, 'speiche');
+    attachWheel(root, 0, 0.32, -0.64, 0.32, 0.09, false, 'speiche');
+    return root;
+  };
+
+  /* ---------- Roller ---------- */
+  B.roller = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var trittbrett = U.box(0.38, 0.1, 0.7, R.dark); trittbrett.position.set(0, 0.36, 0.02); t.add(trittbrett);
+    var beinschild = U.box(0.42, 0.7, 0.14, p); beinschild.position.set(0, 0.72, 0.42); beinschild.rotation.x = -0.16; t.add(beinschild);
+    var heckschale = U.sph(0.3, 12, 10, p); heckschale.scale.set(0.75, 0.8, 1.5);
+    heckschale.position.set(0, 0.66, -0.42); t.add(heckschale);
+    var sitzbank = U.box(0.3, 0.14, 0.62, R.leather); sitzbank.position.set(0, 0.88, -0.36); t.add(sitzbank);
+    var rueckenlehne = U.box(0.26, 0.22, 0.06, R.leather, false); rueckenlehne.position.set(0, 1.02, -0.66); t.add(rueckenlehne);
+    var topcase = U.box(0.34, 0.28, 0.34, p); topcase.position.set(0, 1.08, -0.78); t.add(topcase);
+    var motorblock = U.box(0.2, 0.22, 0.4, R.dark); motorblock.position.set(0.13, 0.4, -0.5); t.add(motorblock);
+    var scheibe = U.box(0.4, 0.4, 0.03, R.clear); scheibe.position.set(0, 1.22, 0.5); scheibe.rotation.x = -0.2; t.add(scheibe);
+    var lenkerverkleidung = U.box(0.34, 0.24, 0.2, p); lenkerverkleidung.position.set(0, 1.0, 0.5); t.add(lenkerverkleidung);
+    var tacho = U.cyl(0.06, 0.06, 0.03, 10, R.chrome, false); tacho.rotation.x = 1.2;
+    tacho.position.set(0, 1.1, 0.44); t.add(tacho);
+    var haken = U.box(0.05, 0.06, 0.05, R.chrome, false); haken.position.set(0, 0.66, 0.34); t.add(haken);
+
+    addExhaust(root, -0.16, 0.32, -0.62, 0.05, 0.36, 0, R.metal);
+    addBars(root, 1.1, 0.46, 0.58, R.dark);
+    addFender(root, 0.66, 0.58, 0.12, 0.3, p);
+
+    var lampe = U.box(0.24, 0.14, 0.1, R.lightF, false); lampe.position.set(0, 0.9, 0.56); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var rueck = U.box(0.16, 0.1, 0.05, R.lightR, false); rueck.position.set(0, 0.82, -0.72); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var bl = U.sph(0.04, 8, 6, R.lightA, false); bl.position.set(s * 0.2, 0.92, 0.5); t.add(bl);
+      root.userData.blinkers.push(bl);
+      var spiegelchen = U.box(0.1, 0.06, 0.02, R.chrome, false); spiegelchen.position.set(s * 0.3, 1.28, 0.46); t.add(spiegelchen);
+    }
+    addPlate(root, 0, 0.66, -0.84, Math.PI, 0.55);
+
+    addRider(root, { suit: 0x4a3b6e, helmet: 0xf0f2f4, lean: 0.05, y: 1.02, z: -0.24 });
+
+    attachWheel(root, 0, 0.26, 0.58, 0.26, 0.12, true, 'sport');
+    attachWheel(root, 0, 0.26, -0.56, 0.26, 0.14, false, 'sport');
+    return root;
+  };
+
+  /* ---------- Enduro / Cross ---------- */
+  B.enduro = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.box(0.16, 0.34, 1.0, R.dark); rahmen.position.set(0, 0.74, 0); t.add(rahmen);
+    var tank = U.box(0.28, 0.24, 0.55, p); tank.position.set(0, 0.98, 0.2); t.add(tank);
+    var spoilerL = U.box(0.06, 0.22, 0.4, p, false); spoilerL.position.set(0.17, 0.92, 0.12); t.add(spoilerL);
+    var spoilerR = U.box(0.06, 0.22, 0.4, p, false); spoilerR.position.set(-0.17, 0.92, 0.12); t.add(spoilerR);
+    var sitz = U.box(0.24, 0.1, 0.75, R.dark); sitz.position.set(0, 0.98, -0.36); t.add(sitz);
+    var heckteil = U.box(0.22, 0.12, 0.3, p, false); heckteil.position.set(0, 1.0, -0.8); t.add(heckteil);
+    var motor = U.box(0.3, 0.32, 0.34, R.metal); motor.position.set(0, 0.62, 0.02); t.add(motor);
+    var kruemmer = U.cyl(0.035, 0.035, 0.6, 8, R.chrome); kruemmer.rotation.x = 0.9;
+    kruemmer.position.set(0.1, 0.82, 0.3); t.add(kruemmer);
+    var schutzblechV = U.box(0.24, 0.05, 0.6, p, false); schutzblechV.position.set(0, 1.06, 0.72); schutzblechV.rotation.x = 0.2; t.add(schutzblechV);
+    var kettenschutz = U.box(0.04, 0.1, 0.5, R.dark, false); kettenschutz.position.set(0.12, 0.6, -0.4); t.add(kettenschutz);
+    var federbein = U.cyl(0.045, 0.045, 0.36, 8, R.rimGold); federbein.rotation.x = 0.4;
+    federbein.position.set(0, 0.78, -0.4); t.add(federbein);
+    var schwinge = U.box(0.1, 0.08, 0.7, R.metal, false); schwinge.position.set(0, 0.56, -0.5); t.add(schwinge);
+    var startnummer = U.box(0.02, 0.22, 0.24, R.white, false); startnummer.position.set(0.21, 0.94, 0.05); t.add(startnummer);
+
+    addExhaust(root, 0.16, 0.86, -0.62, 0.055, 0.55, 0.12, R.metal);
+    addFork(root, 0.11, 0.82, 0.62, 0.86, 0.34, R.rimGold, 0.032);
+    addBars(root, 1.28, 0.42, 0.72, R.dark);
+    addFender(root, 0.9, -0.78, 0.1, 0.34, p);
+
+    var lampe = U.box(0.22, 0.2, 0.1, R.lightF, false); lampe.position.set(0, 1.14, 0.68); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var maske = U.box(0.3, 0.28, 0.06, p, false); maske.position.set(0, 1.16, 0.62); t.add(maske);
+    var rueck = U.box(0.1, 0.08, 0.04, R.lightR, false); rueck.position.set(0, 1.0, -0.94); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    addPlate(root, 0, 0.86, -0.96, Math.PI, 0.5);
+
+    addRider(root, { suit: 0x1f2a38, helmet: 0x27ae60, lean: 0.4, y: 1.16, z: -0.1 });
+
+    attachWheel(root, 0, 0.46, 0.76, 0.46, 0.12, true, 'offroad');
+    attachWheel(root, 0, 0.44, -0.76, 0.44, 0.15, false, 'offroad');
+    return root;
+  };
+
+  /* ---------- Café Racer ---------- */
+  B.caferacer = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.cyl(0.045, 0.045, 1.0, 8, R.chrome); rahmen.rotation.x = Math.PI / 2 - 0.1;
+    rahmen.position.set(0, 0.72, 0.0); t.add(rahmen);
+    var tank = U.sph(0.24, 14, 12, p); tank.scale.set(0.85, 0.72, 1.6);
+    tank.position.set(0, 0.86, 0.2); t.add(tank);
+    var knieausschnittL = U.box(0.04, 0.14, 0.3, R.dark, false); knieausschnittL.position.set(0.2, 0.84, 0.2); t.add(knieausschnittL);
+    var knieausschnittR = knieausschnittL.clone(); knieausschnittR.position.x = -0.2; t.add(knieausschnittR);
+    var sitzbank = U.box(0.24, 0.09, 0.62, R.leather); sitzbank.position.set(0, 0.88, -0.34); t.add(sitzbank);
+    var hoecker = U.sph(0.16, 12, 10, p); hoecker.scale.set(0.9, 0.9, 1.3);
+    hoecker.position.set(0, 0.94, -0.68); t.add(hoecker);
+    var motor = U.box(0.34, 0.3, 0.36, R.alu); motor.position.set(0, 0.6, 0.0); t.add(motor);
+    var kuehlrippen = U.box(0.38, 0.04, 0.3, R.metal, false); kuehlrippen.position.set(0, 0.68, 0.02); t.add(kuehlrippen);
+    var federbein = U.cyl(0.03, 0.03, 0.34, 8, R.chrome); federbein.rotation.x = 0.5;
+    federbein.position.set(0.14, 0.66, -0.5); t.add(federbein);
+    var schwinge2 = U.box(0.1, 0.07, 0.62, R.chrome, false); schwinge2.position.set(0, 0.48, -0.46); t.add(schwinge2);
+    var tacho = U.cyl(0.07, 0.07, 0.05, 12, R.chrome, false); tacho.rotation.x = 1.3;
+    tacho.position.set(0.08, 1.02, 0.5); t.add(tacho);
+    var tacho2 = tacho.clone(); tacho2.position.x = -0.08; t.add(tacho2);
+
+    addExhaust(root, 0.18, 0.5, -0.5, 0.05, 0.9, 0.02, R.chrome);
+    addExhaust(root, -0.18, 0.5, -0.5, 0.05, 0.9, 0.02, R.chrome);
+    addFork(root, 0.1, 0.7, 0.66, 0.72, 0.28, R.chrome, 0.028);
+    addBars(root, 0.98, 0.5, 0.56, R.chrome);
+    addFender(root, 0.78, 0.68, 0.1, 0.34, R.chrome);
+    addFender(root, 0.76, -0.72, 0.1, 0.32, R.chrome);
+
+    var lampe = U.cyl(0.11, 0.11, 0.09, 14, R.lightF, false);
+    lampe.rotation.x = Math.PI / 2; lampe.position.set(0, 0.94, 0.7); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var ring = U.torus(0.12, 0.02, 6, 14, R.chrome, false); ring.position.set(0, 0.94, 0.72); t.add(ring);
+    var rueck = U.box(0.09, 0.07, 0.04, R.lightR, false); rueck.position.set(0, 0.9, -0.86); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    addPlate(root, 0, 0.74, -0.9, Math.PI, 0.5);
+
+    addRider(root, { suit: 0x5a3826, helmet: 0x1d2026, lean: 0.6, y: 0.98, z: -0.06 });
+
+    attachWheel(root, 0, 0.36, 0.7, 0.36, 0.12, true, 'speiche');
+    attachWheel(root, 0, 0.36, -0.7, 0.36, 0.15, false, 'speiche');
+    return root;
+  };
+
+  /* ---------- Chopper ---------- */
+  B.chopper = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.cyl(0.05, 0.05, 1.3, 8, R.chrome); rahmen.rotation.x = Math.PI / 2 - 0.12;
+    rahmen.position.set(0, 0.6, 0.05); t.add(rahmen);
+    var tank = U.sph(0.22, 12, 10, p); tank.scale.set(0.85, 0.8, 1.5);
+    tank.position.set(0, 0.82, 0.25); t.add(tank);
+    var sitz = U.box(0.3, 0.09, 0.5, R.leather); sitz.position.set(0, 0.74, -0.35); t.add(sitz);
+    var sissy = U.box(0.24, 0.5, 0.05, R.chrome); sissy.position.set(0, 0.98, -0.68); sissy.rotation.x = 0.22; t.add(sissy);
+    var motorV = U.box(0.3, 0.3, 0.16, R.alu); motorV.position.set(0, 0.6, 0.1); motorV.rotation.x = -0.35; t.add(motorV);
+    var motorH = U.box(0.3, 0.3, 0.16, R.alu); motorH.position.set(0, 0.6, -0.08); motorH.rotation.x = 0.35; t.add(motorH);
+    var getriebe = U.box(0.26, 0.2, 0.3, R.chrome); getriebe.position.set(0, 0.44, -0.16); t.add(getriebe);
+    var luftfilter = U.cyl(0.1, 0.1, 0.08, 12, R.chrome, false);
+    luftfilter.rotation.z = Math.PI / 2; luftfilter.position.set(0.22, 0.62, 0.02); t.add(luftfilter);
+    var trittbretter = U.box(0.5, 0.03, 0.16, R.chrome, false); trittbretter.position.set(0, 0.34, 0.18); t.add(trittbretter);
+    var satteltasche = U.box(0.1, 0.24, 0.34, R.leather); satteltasche.position.set(0.24, 0.62, -0.55); t.add(satteltasche);
+    var satteltasche2 = satteltasche.clone(); satteltasche2.position.x = -0.24; t.add(satteltasche2);
+
+    addExhaust(root, 0.2, 0.42, -0.5, 0.055, 1.0, 0.06, R.chrome);
+    addExhaust(root, -0.2, 0.36, -0.5, 0.055, 1.0, 0.06, R.chrome);
+    addFork(root, 0.11, 0.66, 0.82, 1.15, 0.62, R.chrome, 0.03);
+    addBars(root, 1.24, 0.5, 0.78, R.chrome);
+    addFender(root, 0.82, -0.68, 0.24, 0.42, p);
+
+    var lampe = U.cyl(0.12, 0.12, 0.1, 14, R.lightF, false);
+    lampe.rotation.x = Math.PI / 2; lampe.position.set(0, 0.98, 1.02); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var bl = U.cyl(0.035, 0.035, 0.06, 8, R.lightA, false);
+      bl.rotation.x = Math.PI / 2; bl.position.set(s * 0.22, 1.0, 0.96); t.add(bl);
+      root.userData.blinkers.push(bl);
+    }
+    var rueck = U.cyl(0.06, 0.06, 0.05, 10, R.lightR, false);
+    rueck.rotation.x = Math.PI / 2; rueck.position.set(0, 0.86, -0.92); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    addPlate(root, 0, 0.7, -0.94, Math.PI, 0.55);
+
+    addRider(root, { suit: 0x2b2b30, helmet: 0x8a1c1c, lean: 0.05, y: 0.9, z: -0.16 });
+
+    attachWheel(root, 0, 0.44, 1.02, 0.44, 0.1, true, 'speiche');
+    attachWheel(root, 0, 0.42, -0.66, 0.42, 0.26, false, 'sport');
+    return root;
+  };
+
+  /* ---------- Bobber ---------- */
+  B.bobber = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paintMatte(color);
+
+    var rahmen = U.cyl(0.05, 0.05, 1.05, 8, R.dark); rahmen.rotation.x = Math.PI / 2 - 0.05;
+    rahmen.position.set(0, 0.62, 0.02); t.add(rahmen);
+    var untergurt = U.cyl(0.035, 0.035, 0.9, 8, R.dark); untergurt.rotation.x = Math.PI / 2;
+    untergurt.position.set(0, 0.42, 0.0); t.add(untergurt);
+    var tank = U.sph(0.2, 12, 10, p); tank.scale.set(0.9, 0.85, 1.2);
+    tank.position.set(0, 0.8, 0.28); t.add(tank);
+    var solositz = U.box(0.26, 0.07, 0.34, R.leather); solositz.position.set(0, 0.8, -0.34); t.add(solositz);
+    var sitzfeder = U.cyl(0.02, 0.02, 0.12, 6, R.chrome, false); sitzfeder.position.set(0.09, 0.72, -0.44); t.add(sitzfeder);
+    var sitzfeder2 = sitzfeder.clone(); sitzfeder2.position.x = -0.09; t.add(sitzfeder2);
+    var motor = U.box(0.32, 0.34, 0.3, R.dark); motor.position.set(0, 0.58, 0.0); t.add(motor);
+    var rippen = U.box(0.36, 0.04, 0.26, R.alu, false); rippen.position.set(0, 0.68, 0.0); t.add(rippen);
+    var rippen2 = U.box(0.36, 0.04, 0.26, R.alu, false); rippen2.position.set(0, 0.58, 0.0); t.add(rippen2);
+    var oel = U.cyl(0.09, 0.09, 0.2, 10, R.chrome); oel.position.set(0, 0.62, -0.4); t.add(oel);
+    var schwinge = U.box(0.12, 0.06, 0.56, R.dark, false); schwinge.position.set(0, 0.46, -0.42); t.add(schwinge);
+
+    addExhaust(root, 0.16, 0.4, -0.44, 0.06, 1.1, 0.0, R.dark);
+    addExhaust(root, -0.16, 0.5, -0.44, 0.06, 1.1, 0.0, R.dark);
+    addFork(root, 0.1, 0.66, 0.7, 0.8, 0.4, R.dark, 0.032);
+    addBars(root, 1.06, 0.46, 0.7, R.dark);
+    addFender(root, 0.86, -0.72, 0.2, 0.44, p, -0.4);
+
+    var lampe = U.cyl(0.1, 0.1, 0.09, 12, R.lightF, false);
+    lampe.rotation.x = Math.PI / 2; lampe.position.set(0, 0.9, 0.78); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var rueck = U.cyl(0.05, 0.05, 0.05, 10, R.lightR, false);
+    rueck.rotation.x = Math.PI / 2; rueck.position.set(0, 0.82, -0.94); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    addPlate(root, 0.16, 0.66, -0.9, Math.PI, 0.5);
+
+    addRider(root, { suit: 0x3a3f46, helmet: 0x1c1f24, lean: 0.15, y: 0.94, z: -0.14 });
+
+    attachWheel(root, 0, 0.42, 0.74, 0.42, 0.16, true, 'speiche');
+    attachWheel(root, 0, 0.42, -0.74, 0.42, 0.22, false, 'speiche');
+    return root;
+  };
+
+  /* ---------- Tourenmotorrad ---------- */
+  B.tourer = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.box(0.18, 0.3, 1.1, R.dark); rahmen.position.set(0, 0.68, 0.0); t.add(rahmen);
+    var verkleidung = U.box(0.5, 0.6, 0.7, p); verkleidung.position.set(0, 0.94, 0.5); t.add(verkleidung);
+    var scheibe = U.box(0.42, 0.44, 0.04, R.clear); scheibe.position.set(0, 1.36, 0.5); scheibe.rotation.x = -0.24; t.add(scheibe);
+    var tank = U.box(0.34, 0.26, 0.6, p); tank.position.set(0, 0.98, 0.12); t.add(tank);
+    var sitz = U.box(0.32, 0.14, 0.5, R.leather); sitz.position.set(0, 0.96, -0.3); t.add(sitz);
+    var soziussitz = U.box(0.3, 0.16, 0.3, R.leather); soziussitz.position.set(0, 1.04, -0.66); t.add(soziussitz);
+    var topcase = U.box(0.42, 0.32, 0.4, p); topcase.position.set(0, 1.22, -0.82); t.add(topcase);
+    var motor = U.box(0.42, 0.32, 0.4, R.alu); motor.position.set(0, 0.62, 0.02); t.add(motor);
+    var kuehler = U.box(0.32, 0.28, 0.06, R.grille, false); kuehler.position.set(0, 0.66, 0.28); t.add(kuehler);
+
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var koffer = U.box(0.2, 0.34, 0.5, p); koffer.position.set(s * 0.34, 0.9, -0.6); t.add(koffer);
+      var reflektor = U.box(0.03, 0.08, 0.16, R.lightR, false); reflektor.position.set(s * 0.45, 0.9, -0.72); t.add(reflektor);
+      var sturzbuegel = U.cyl(0.022, 0.022, 0.5, 6, R.chrome, false);
+      sturzbuegel.rotation.z = 0.5 * s; sturzbuegel.position.set(s * 0.3, 0.6, 0.24); t.add(sturzbuegel);
+      var zusatz = U.cyl(0.055, 0.055, 0.06, 10, R.lightF, false);
+      zusatz.rotation.x = Math.PI / 2; zusatz.position.set(s * 0.28, 0.88, 0.82); t.add(zusatz);
+      root.userData.headlights.push(zusatz);
+    }
+
+    addExhaust(root, 0.24, 0.5, -0.6, 0.07, 0.7, 0.04, R.chrome);
+    addFork(root, 0.12, 0.72, 0.66, 0.8, 0.3, R.metal, 0.034);
+    addBars(root, 1.14, 0.4, 0.74, R.dark);
+    addFender(root, 0.92, 0.72, 0.14, 0.38, p);
+    addFender(root, 0.86, -0.78, 0.14, 0.36, p);
+
+    var lampe = U.box(0.3, 0.18, 0.1, R.lightF, false); lampe.position.set(0, 1.02, 0.84); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var rueck = U.box(0.16, 0.1, 0.05, R.lightR, false); rueck.position.set(0, 1.06, -1.04); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    addPlate(root, 0, 0.84, -1.02, Math.PI, 0.55);
+
+    addRider(root, { suit: 0x24303f, helmet: 0xe8e2d2, lean: 0.15, y: 1.08, z: -0.18 });
+
+    attachWheel(root, 0, 0.4, 0.72, 0.4, 0.13, true, 'sport');
+    attachWheel(root, 0, 0.4, -0.78, 0.4, 0.18, false, 'sport');
+    return root;
+  };
+
+  /* ---------- Superbike ---------- */
+  B.superbike = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.box(0.3, 0.22, 0.9, R.alu); rahmen.position.set(0, 0.78, 0.05); t.add(rahmen);
+    var verkleidung = U.box(0.38, 0.46, 1.1, p); verkleidung.position.set(0, 0.8, 0.3); verkleidung.rotation.x = -0.1; t.add(verkleidung);
+    var nase = U.box(0.28, 0.3, 0.42, p); nase.position.set(0, 1.0, 0.86); nase.rotation.x = 0.5; t.add(nase);
+    var scheibe = U.box(0.24, 0.2, 0.04, R.glass, false); scheibe.position.set(0, 1.12, 0.72); scheibe.rotation.x = -0.5; t.add(scheibe);
+    var tank = U.box(0.32, 0.2, 0.5, p); tank.position.set(0, 0.98, 0.24); t.add(tank);
+    var sitz = U.box(0.24, 0.1, 0.5, R.dark); sitz.position.set(0, 0.98, -0.3); t.add(sitz);
+    var heck = U.box(0.22, 0.14, 0.42, p); heck.position.set(0, 1.06, -0.72); heck.rotation.x = 0.28; t.add(heck);
+    var motor = U.box(0.36, 0.3, 0.38, R.dark); motor.position.set(0, 0.62, 0.05); t.add(motor);
+    var schwinge = U.box(0.14, 0.09, 0.66, R.alu, false); schwinge.position.set(0, 0.5, -0.44); t.add(schwinge);
+    var federbein = U.cyl(0.035, 0.035, 0.3, 8, R.rimGold); federbein.rotation.x = 0.3;
+    federbein.position.set(0, 0.74, -0.36); t.add(federbein);
+    var kettenrad = U.cyl(0.11, 0.11, 0.02, 14, R.alu, false); kettenrad.rotation.z = Math.PI / 2;
+    kettenrad.position.set(0.12, 0.4, -0.76); t.add(kettenrad);
+    var rastenL = U.box(0.06, 0.03, 0.12, R.alu, false); rastenL.position.set(0.2, 0.5, -0.24); t.add(rastenL);
+    var rastenR = rastenL.clone(); rastenR.position.x = -0.2; t.add(rastenR);
+    var winglet = U.box(0.44, 0.03, 0.14, R.dark, false); winglet.position.set(0, 0.86, 0.62); t.add(winglet);
+
+    addExhaust(root, 0.14, 0.86, -0.86, 0.06, 0.34, -0.25, R.metal);
+    addExhaust(root, -0.14, 0.86, -0.86, 0.06, 0.34, -0.25, R.metal);
+    addFork(root, 0.11, 0.72, 0.7, 0.72, 0.26, R.rimGold, 0.032);
+    addBars(root, 0.94, 0.56, 0.5, R.alu);
+    addFender(root, 0.86, 0.74, 0.12, 0.36, p);
+
+    var lampeL = U.box(0.11, 0.09, 0.08, R.lightF, false); lampeL.position.set(0.08, 1.02, 1.02); t.add(lampeL);
+    var lampeR = U.box(0.11, 0.09, 0.08, R.lightF, false); lampeR.position.set(-0.08, 1.02, 1.02); t.add(lampeR);
+    root.userData.headlights.push(lampeL); root.userData.headlights.push(lampeR);
+    var rueck = U.box(0.12, 0.06, 0.04, R.lightR, false); rueck.position.set(0, 1.08, -0.94); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    addPlate(root, 0, 0.78, -0.9, Math.PI, 0.5);
+
+    addRider(root, { suit: 0x14203a, helmet: 0x0e6fd8, lean: 0.85, y: 1.0, z: -0.02 });
+
+    attachWheel(root, 0, 0.34, 0.76, 0.34, 0.14, true, 'sport');
+    attachWheel(root, 0, 0.36, -0.76, 0.36, 0.2, false, 'sport');
+    return root;
+  };
+
+  /* ---------- Quad ---------- */
+  B.quad = function (color) {
+    var root = baseGroup(), t = root.userData.tilt, p = paint(color);
+
+    var rahmen = U.box(0.6, 0.18, 1.5, R.dark); rahmen.position.set(0, 0.56, 0); t.add(rahmen);
+    var haube = U.box(0.72, 0.24, 0.9, p); haube.position.set(0, 0.76, 0.45); t.add(haube);
+    var kotfluegelV = U.box(1.24, 0.12, 0.62, p, false); kotfluegelV.position.set(0, 0.74, 0.62); t.add(kotfluegelV);
+    var kotfluegelH = U.box(1.30, 0.12, 0.7, p, false); kotfluegelH.position.set(0, 0.76, -0.62); t.add(kotfluegelH);
+    var sitz = U.box(0.34, 0.16, 0.7, R.dark); sitz.position.set(0, 0.86, -0.16); t.add(sitz);
+    var motor = U.box(0.4, 0.34, 0.44, R.metal); motor.position.set(0, 0.5, 0.02); t.add(motor);
+    var traeger = U.box(0.6, 0.04, 0.4, R.metal, false); traeger.position.set(0, 0.94, -0.82); t.add(traeger);
+    var traegerV = U.box(0.5, 0.04, 0.3, R.metal, false); traegerV.position.set(0, 0.92, 0.78); t.add(traegerV);
+    var tank2 = U.box(0.34, 0.2, 0.36, p); tank2.position.set(0, 0.86, 0.24); t.add(tank2);
+
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var trittbrett = U.box(0.22, 0.05, 0.7, R.dark, false); trittbrett.position.set(s * 0.42, 0.44, -0.1); t.add(trittbrett);
+      var buegel = U.cyl(0.025, 0.025, 0.5, 6, R.metal, false);
+      buegel.rotation.x = Math.PI / 2; buegel.position.set(s * 0.45, 0.6, -0.7); t.add(buegel);
+    }
+
+    addBars(root, 1.1, 0.32, 0.66, R.dark);
+    var lampe = U.box(0.4, 0.14, 0.1, R.lightF, false); lampe.position.set(0, 0.92, 0.9); t.add(lampe);
+    root.userData.headlights.push(lampe);
+    var rueck = U.box(0.16, 0.08, 0.05, R.lightR, false); rueck.position.set(0, 0.86, -0.98); t.add(rueck);
+    root.userData.tailLights.push(rueck);
+    var wimpel = U.cyl(0.01, 0.01, 1.0, 6, R.metal, false); wimpel.position.set(-0.3, 1.4, -0.8); t.add(wimpel);
+    var wimpelTuch = U.box(0.02, 0.12, 0.2, R.lightA, false); wimpelTuch.position.set(-0.3, 1.82, -0.72); t.add(wimpelTuch);
+    addPlate(root, 0, 0.68, -1.0, Math.PI, 0.55);
+
+    addRider(root, { suit: 0x6b3f1f, helmet: 0xe0a132, lean: 0.2, y: 1.0, z: -0.12 });
+
+    axles(root, { x: 0.52, y: 0.34, z: 0.72, r: 0.34, w: 0.24, rz: -0.72, rr: 0.36, rw: 0.3, ry: 0.36, style: 'offroad' });
+    return root;
+  };
+
+  /* ---------- Polizeimotorrad (nicht kaufbar) ---------- */
+  B.polizeibike = function (color) {
+    var root = B.tourer(color === undefined ? 0xf2f4f6 : color);
+    var t = root.userData.tilt;
+
+    var i, s;
+    for (i = 0; i < 2; i++) {
+      s = i ? -1 : 1;
+      var blau = U.box(0.14, 0.1, 0.16, R.lightBlue, false);
+      blau.position.set(s * 0.3, 1.24, -0.55); t.add(blau);
+      if (!root.userData.sirenLights) root.userData.sirenLights = [];
+      root.userData.sirenLights.push(blau);
+      var streifen = U.box(0.03, 0.12, 0.4, U.mat(0x1a55a8, 0.6, 0.1), false);
+      streifen.position.set(s * 0.45, 0.94, -0.6); t.add(streifen);
+    }
+    var kelle = U.box(0.2, 0.02, 0.2, R.lightA, false);
+    kelle.position.set(0, 1.44, -0.82); t.add(kelle);
+    root.userData.siren = kelle;
+    return root;
+  };
+
+  V.BUILDERS = B;
+
+  /* ==========================================================
+     KATALOG — was man fahren und kaufen kann
+     Werte: accel/max in m/s, kmh nur fuer die Anzeige,
+     offGrip = Halt abseits der Strasse, wb = Radstand.
+     ========================================================== */
+  V.CATALOG = [
+    // ---------------- Autos ----------------
+    { id: 'rs_coupe',   bau: 'sport',      name: 'RS Coupé',       desc: 'Sportwagen · Heckantrieb',        cls: 'car', color: 0xd6362b, accel: 24, max: 64, steer: 0.60, wb: 2.70, kmh: 230, offGrip: 0.70, radius: 1.40, seats: 2, price: 0 },
+    { id: 'polo',       bau: 'kleinwagen', name: 'Alpen Mini',     desc: 'Kleinwagen · sparsam und wendig', cls: 'car', color: 0x7fb2d8, accel: 14, max: 44, steer: 0.72, wb: 2.35, kmh: 158, offGrip: 0.72, radius: 1.20, seats: 4, price: 900 },
+    { id: 'kombi320',   bau: 'kombi',      name: '320 Kombi',      desc: 'Diesel-Kombi · Alltagsheld',      cls: 'car', color: 0x33507c, accel: 15, max: 53, steer: 0.60, wb: 2.90, kmh: 190, offGrip: 0.75, radius: 1.40, seats: 5, price: 1500 },
+    { id: 'taxi',       bau: 'taxi',       name: 'Ortstaxi',       desc: 'Taxi · kennt jede Abkürzung',     cls: 'car', color: 0xf0c020, accel: 16, max: 52, steer: 0.62, wb: 2.85, kmh: 187, offGrip: 0.74, radius: 1.40, seats: 5, price: 2200 },
+    { id: 'van',        bau: 'van',        name: 'Alpen-Van',      desc: 'Transporter · viel Platz',        cls: 'car', color: 0xc8cdd2, accel: 12, max: 44, steer: 0.55, wb: 3.20, kmh: 160, offGrip: 0.70, radius: 1.60, seats: 9, price: 3000 },
+    { id: 'suv',        bau: 'suv',        name: 'Alpin SUV',      desc: 'Allrad · stark im Gelände',       cls: 'car', color: 0x2b2f36, accel: 14, max: 47, steer: 0.58, wb: 2.95, kmh: 170, offGrip: 1.00, radius: 1.50, seats: 5, price: 4000 },
+    { id: 'pickup',     bau: 'pickup',     name: 'Ranch 4x4',      desc: 'Pickup · V8 mit Ladefläche',      cls: 'car', color: 0x7b3f24, accel: 16, max: 50, steer: 0.56, wb: 3.05, kmh: 180, offGrip: 0.95, radius: 1.55, seats: 4, price: 5000 },
+    { id: 'classic',    bau: 'classic',    name: 'Landstraße 63',  desc: 'Oldtimer · Chrom ohne Ende',      cls: 'car', color: 0x86142a, accel: 13, max: 49, steer: 0.58, wb: 2.75, kmh: 176, offGrip: 0.65, radius: 1.35, seats: 4, price: 6000 },
+    { id: 'traktor',    bau: 'traktor',    name: 'Steyrer 40',     desc: 'Traktor · langsam, aber nimmt alles mit', cls: 'car', color: 0xc23b25, accel: 9, max: 26, steer: 0.52, wb: 2.40, kmh: 94, offGrip: 1.15, radius: 1.60, seats: 1, price: 6500 },
+    { id: 'cabrio',     bau: 'cabrio',     name: 'Seewind Cabrio', desc: 'Offen fahren am Badesee',         cls: 'car', color: 0xe8e2d0, accel: 20, max: 58, steer: 0.63, wb: 2.65, kmh: 208, offGrip: 0.66, radius: 1.35, seats: 2, price: 8000 },
+    { id: 'muscle',     bau: 'muscle',     name: 'Donau V8',       desc: 'Muscle Car · laut und quer',      cls: 'car', color: 0x1f6f3a, accel: 26, max: 66, steer: 0.55, wb: 2.90, kmh: 237, offGrip: 0.60, radius: 1.45, seats: 4, price: 11000 },
+    { id: 'limo',       bau: 'limo',       name: 'Bürgermeister',  desc: 'Limousine · für den großen Auftritt', cls: 'car', color: 0x14171c, accel: 17, max: 56, steer: 0.54, wb: 3.30, kmh: 202, offGrip: 0.62, radius: 1.60, seats: 5, price: 13000 },
+    { id: 'bus',        bau: 'bus',        name: 'Postbus',        desc: 'Linienbus · Platz für das ganze Dorf', cls: 'car', color: 0xf2c200, accel: 10, max: 40, steer: 0.46, wb: 4.20, kmh: 144, offGrip: 0.58, radius: 2.10, seats: 40, price: 15000 },
+    { id: 'lkw',        bau: 'lkw',        name: 'Fuhrwerk 7,5t',  desc: 'LKW · räumt alles aus dem Weg',   cls: 'car', color: 0x3a5f8a, accel: 9, max: 38, steer: 0.44, wb: 4.40, kmh: 137, offGrip: 0.62, radius: 2.20, seats: 3, price: 17000 },
+    { id: 'rally',      bau: 'rally',      name: 'Schotter WRC',   desc: 'Rallyeauto · für Feldwege gemacht', cls: 'car', color: 0x1e5fc0, accel: 28, max: 63, steer: 0.70, wb: 2.60, kmh: 227, offGrip: 1.10, radius: 1.38, seats: 2, price: 21000 },
+    { id: 'militaer',   bau: 'militaer',   name: 'Bundesheer 4x4', desc: 'Geländewagen · fährt überall',    cls: 'car', color: 0x4a5535, accel: 15, max: 46, steer: 0.60, wb: 3.00, kmh: 166, offGrip: 1.20, radius: 1.65, seats: 6, price: 26000 },
+    { id: 'hyper',      bau: 'hyper',      name: 'Falke GT-X',     desc: 'Hypercar · 920 PS',               cls: 'car', color: 0xffb020, accel: 34, max: 82, steer: 0.55, wb: 2.85, kmh: 295, offGrip: 0.55, radius: 1.45, seats: 2, price: 45000 },
+
+    // ---------------- Zweiräder ----------------
+    { id: 'fahrrad',    bau: 'fahrrad',    name: 'Alpenrad',       desc: 'Fahrrad · kostet nix an der Tankstelle', cls: 'bike', bike: true, color: 0x2f7d4f, accel: 9,  max: 22, steer: 1.00, wb: 1.05, kmh: 79,  offGrip: 0.90, radius: 0.70, seats: 1, price: 300 },
+    { id: 'moped',      bau: 'moped',      name: 'Puch Moped',     desc: 'Moped · 50 ccm Dorfklassiker',    cls: 'bike', bike: true, color: 0x9a2f2f, accel: 13, max: 31, steer: 0.95, wb: 1.15, kmh: 112, offGrip: 0.80, radius: 0.75, seats: 1, price: 1200 },
+    { id: 'roller',     bau: 'roller',     name: 'Vespo 125',      desc: 'Roller · flott durch die Gassen', cls: 'bike', bike: true, color: 0x4aa3c8, accel: 16, max: 38, steer: 0.92, wb: 1.25, kmh: 137, offGrip: 0.75, radius: 0.78, seats: 2, price: 2000 },
+    { id: 'enduro',     bau: 'enduro',     name: 'Cross 250',      desc: 'Enduro · Wiese ist auch Straße',  cls: 'bike', bike: true, color: 0x27ae60, accel: 27, max: 57, steer: 0.85, wb: 1.45, kmh: 205, offGrip: 0.95, radius: 0.90, seats: 1, price: 2500 },
+    { id: 'quad',       bau: 'quad',       name: 'Quad 700',       desc: 'Quad · vier Räder, kein Dach',    cls: 'bike', color: 0xd85a1e, accel: 20, max: 45, steer: 0.80, wb: 1.60, kmh: 162, offGrip: 1.15, radius: 1.00, seats: 2, price: 5500 },
+    { id: 'caferacer',  bau: 'caferacer',  name: 'Café Racer',     desc: 'Umgebaut · schön und unbequem',   cls: 'bike', bike: true, color: 0x1d6f6f, accel: 25, max: 60, steer: 0.82, wb: 1.42, kmh: 216, offGrip: 0.62, radius: 0.88, seats: 1, price: 7000 },
+    { id: 'bobber',     bau: 'bobber',     name: 'Bobber 900',     desc: 'Tiefergelegt · brabbelt schön',   cls: 'bike', bike: true, color: 0x2b2b30, accel: 22, max: 55, steer: 0.74, wb: 1.62, kmh: 198, offGrip: 0.66, radius: 0.92, seats: 1, price: 8500 },
+    { id: 'chopper',    bau: 'chopper',    name: 'Chopper 1200',   desc: 'Cruiser · V2 mit langer Gabel',   cls: 'bike', bike: true, color: 0x191d24, accel: 20, max: 54, steer: 0.70, wb: 1.75, kmh: 194, offGrip: 0.68, radius: 0.95, seats: 2, price: 10000 },
+    { id: 'tourer',     bau: 'tourer',     name: 'Alpen Tourer',   desc: 'Reisemaschine · Koffer inklusive', cls: 'bike', bike: true, color: 0x35507d, accel: 24, max: 62, steer: 0.72, wb: 1.58, kmh: 223, offGrip: 0.72, radius: 0.95, seats: 2, price: 14000 },
+    { id: 'superbike',  bau: 'superbike',  name: 'RR 1000',        desc: 'Superbike · 210 PS am Hinterrad', cls: 'bike', bike: true, color: 0x0e6fd8, accel: 32, max: 74, steer: 0.80, wb: 1.42, kmh: 266, offGrip: 0.50, radius: 0.90, seats: 1, price: 30000 }
+  ];
+
+  // Fremde Fahrzeuge (Verkehr) und Polizei fahren mit festen Werten.
+  V.TRAFFIC_PARAMS = {
+    id: 'geklaut', name: 'Geklautes Fahrzeug', cls: 'car',
+    accel: 16, max: 50, steer: 0.60, wb: 2.85, kmh: 180,
+    offGrip: 0.75, radius: 1.40, seats: 4, price: 0
+  };
+  V.COP_PARAMS = {
+    id: 'streife', name: 'Streifenwagen', cls: 'car',
+    accel: 22, max: 60, steer: 0.62, wb: 2.85, kmh: 216,
+    offGrip: 0.80, radius: 1.40, seats: 4, price: 0
+  };
+
+  var byIdCache = null;
+  V.byId = function (id) {
+    if (!byIdCache) {
+      byIdCache = {};
+      for (var i = 0; i < V.CATALOG.length; i++) byIdCache[V.CATALOG[i].id] = V.CATALOG[i];
+    }
+    return byIdCache[id] || null;
+  };
+
+  V.byClass = function (cls) {
+    return V.CATALOG.filter(function (v) { return v.cls === cls; });
+  };
+
+  /**
+   * Baut ein Fahrzeug aus dem Katalog.
+   * @param {string} id            Katalog-Kennung
+   * @param {number} [colorOverride] abweichende Lackfarbe
+   */
+  V.build = function (id, colorOverride) {
+    ensure();
+    var spec = V.byId(id);
+    if (!spec) spec = V.CATALOG[0];
+    var bauer = B[spec.bau] || B.sport;
+    var root = bauer(colorOverride === undefined ? spec.color : colorOverride);
+    root.userData.spec = spec;
+    root.castShadow = true;
+    return root;
+  };
+
+  V.buildCop = function () {
+    ensure();
+    var root = B.streifenwagen(0xf2f4f6);
+    root.userData.spec = V.COP_PARAMS;
+    return root;
+  };
+
+  V.buildCopBike = function () {
+    ensure();
+    var root = B.polizeibike(0xf2f4f6);
+    root.userData.spec = V.COP_PARAMS;
+    return root;
+  };
+
+  /* Ein zufälliges Fahrzeug, das zum Verkehr passt (nichts Exotisches). */
+  V.randomTraffic = function () {
+    var pool = V.CATALOG.filter(function (v) {
+      return v.cls === 'car' && v.price <= 17000 && v.id !== 'traktor';
+    });
+    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : V.CATALOG[0];
+  };
 
   return V;
 })();

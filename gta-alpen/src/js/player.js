@@ -253,8 +253,17 @@ GTA.Player = (function () {
   };
 
   /* ---------------- Innenräume ---------------- */
-  // Welches Haus enthält den Punkt? (Häuser stehen achsenparallel.)
+  // Welches Haus enthält den Punkt? Vorrang hat die genaue Prüfung aus
+  // GTA.Interiors; der eigene Rechteck-Test ist nur die Rückfallebene.
   P.interiorAt = function (ctx, x, z) {
+    if (GTA.Interiors && GTA.Interiors.at) {
+      var rec = GTA.Interiors.at(x, z);
+      if (!rec) return null;
+      for (var k = 0; k < ctx.interiors.length; k++) {
+        if (ctx.interiors[k].id === rec.id) return ctx.interiors[k];
+      }
+      return null;
+    }
     for (var i = 0; i < ctx.interiors.length; i++) {
       var it = ctx.interiors[i];
       if (Math.abs(x - it.x) < it.w / 2 && Math.abs(z - it.z) < it.d / 2) return it;
@@ -262,17 +271,13 @@ GTA.Player = (function () {
     return null;
   };
 
+  /* Merkt sich nur, in welchem Haus der Spieler steht. Das Ein- und
+     Ausblenden von Dach und Decke erledigt GTA.Interiors.update. */
   P.updateInterior = function (ctx) {
     var p = ctx.player;
-    if (p.car) { p.interiorId = null; ctx.activeInterior = null; return; }
+    if (p.car) { p.interiorId = null; return; }
     var it = P.interiorAt(ctx, p.x, p.z);
-    var id = it ? it.id : null;
-    if (id !== p.interiorId) {
-      p.interiorId = id;
-      ctx.activeInterior = id;
-      if (GTA.Audio) GTA.Audio.door();
-      if (id !== null && it && GTA.UI) GTA.UI.showToast(it.name || 'Haus', 'betreten', '#8ed1ff');
-    }
+    p.interiorId = it ? it.id : null;
   };
 
   /* ---------------- Physik ---------------- */

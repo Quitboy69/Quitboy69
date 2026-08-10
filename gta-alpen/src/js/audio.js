@@ -135,6 +135,23 @@ GTA.Audio = (function () {
   A.siren = function () { A.sweep(600, 950, 0.4, 0.09, 'sine'); };
   A.empty = function () { A.beep(120, 0.04, 0.15, 'square'); };
 
+  /* Klang über einen Namen auslösen — bequem für andere Module,
+     die keine eigene Klangkenntnis haben sollen. */
+  var NAMEN = {
+    schuss: 'shot', treffer: 'hit', schlag: 'thud', krach: 'crash',
+    schwung: 'swing', tuer: 'door', pickup: 'pickup', geld: 'cash',
+    fanfare: 'jingle', fehlschlag: 'fail', checkpoint: 'checkpoint',
+    nachladen: 'reload', sirene: 'siren', leer: 'empty',
+    shot: 'shot', hit: 'hit', thud: 'thud', crash: 'crash', swing: 'swing',
+    door: 'door', cash: 'cash', jingle: 'jingle', fail: 'fail',
+    reload: 'reload', siren: 'siren', empty: 'empty'
+  };
+  A.play = function (name, arg) {
+    var fn = NAMEN[name];
+    if (fn && typeof A[fn] === 'function') { A[fn](arg); return true; }
+    return false;
+  };
+
   /* ---------------- Motor ---------------- */
   A.updateEngine = function (ctx) {
     if (!AC || !engine) return;
