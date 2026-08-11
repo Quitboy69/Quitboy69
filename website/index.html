@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora — Die Analytics-Plattform für moderne Produktteams</title>
+    <meta
+      name="description"
+      content="Aurora verwandelt Produktdaten in Entscheidungen. Echtzeit-Analytics, Session Replay und KI-Insights in einer Plattform. Kostenlos starten, ohne Kreditkarte."
+    />
+    <meta name="author" content="Aurora Labs" />
+    <meta name="theme-color" content="#0a0a12" />
+
+    <meta property="og:title" content="Aurora — Analytics für moderne Produktteams" />
+    <meta
+      property="og:description"
+      content="Echtzeit-Analytics, Session Replay und KI-Insights in einer Plattform."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Theme vor dem ersten Paint setzen, damit es nicht flackert.
+      (function () {
+        try {
+          var stored = localStorage.getItem("aurora-theme");
+          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = stored || (prefersDark ? "dark" : "light");
+          document.documentElement.classList.toggle("dark", theme === "dark");
+        } catch (e) {
+          /* localStorage kann blockiert sein — dann bleibt der Default */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
