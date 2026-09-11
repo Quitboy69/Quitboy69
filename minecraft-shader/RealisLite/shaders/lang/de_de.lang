@@ -1,0 +1,77 @@
+profile.NIEDRIG=Niedrig
+profile.MITTEL=Mittel (UHD 620)
+profile.HOCH=Hoch
+profile.ULTRA=Ultra
+profile.comment=Mittel ist fuer den HP EliteBook 850 G5 (Intel UHD 620) abgestimmt.
+
+screen.SCHATTEN=Schatten
+screen.LICHT=Beleuchtung
+screen.HIMMEL=Himmel & Nebel
+screen.WASSER=Wasser
+screen.ANIMATION=Wind & Animation
+screen.BILD=Bildlook
+
+option.SHADOWS=Schatten
+option.SHADOWS.comment=Dynamische Sonnen-/Mondschatten. Groesster Realismus-Gewinn, aber auch teuerster Effekt.
+option.shadowMapResolution=Schattenaufloesung
+option.shadowMapResolution.comment=1024 ist der beste Kompromiss fuer die UHD 620. 2048 nur mit starker GPU.
+option.shadowDistance=Schattenweite
+option.SHADOW_SAMPLES=Schatten-Weichheit (Samples)
+option.SHADOW_SAMPLES.comment=Mehr Samples = weichere Schattenkanten, kostet GPU-Zeit.
+option.SHADOW_SOFTNESS=Schatten-Unschaerfe
+option.SHADOW_DISTORTION=Schatten-Verzerrung
+option.SHADOW_DISTORTION.comment=Hoeher = schaerfere Schatten nahe am Spieler, unschaerfer in der Ferne.
+option.COLORED_SHADOWS=Farbige Schatten
+option.COLORED_SHADOWS.comment=Glas und Wasser faerben Schatten. Kostet ca. 5-10 % FPS.
+option.ENTITY_SHADOWS=Mob-Schatten
+option.sunPathRotation=Sonnenbahn-Neigung
+
+option.SUN_INTENSITY=Sonnenstaerke
+option.AMBIENT_INTENSITY=Umgebungslicht
+option.NIGHT_BRIGHTNESS=Nacht-Helligkeit
+option.TORCH_INTENSITY=Fackel-Helligkeit
+option.TORCH_TEMPERATURE=Fackel-Farbe
+value.TORCH_TEMPERATURE.0=Kuehl
+value.TORCH_TEMPERATURE.1=Warm
+value.TORCH_TEMPERATURE.2=Sehr warm
+option.SPECULAR=Glanzlichter
+option.RAIN_WETNESS=Nasse Oberflaechen bei Regen
+
+option.STARS=Sterne
+option.STAR_BRIGHTNESS=Sternen-Helligkeit
+option.SUN_GLOW=Sonnen-Glow
+option.FOG=Nebel
+option.FOG_DENSITY=Nebeldichte
+option.FOG_HEIGHT=Bodennebel
+option.FOG_HEIGHT.comment=Dichter Nebel in tiefen Lagen, besonders morgens, abends und bei Regen.
+option.FOG_HEIGHT_LEVEL=Bodennebel-Hoehe (Y)
+option.CLOUD_BRIGHTNESS=Wolken-Helligkeit
+
+option.WATER_WAVES=Wellen
+option.WATER_WAVE_HEIGHT=Wellenhoehe
+option.WATER_REFLECTION=Wasser-Reflexion
+option.WATER_REFLECTION.comment=Spiegelt Himmel und Sonne (guenstig, kein Screen-Space-Verfahren).
+option.WATER_ALPHA=Wasser-Deckkraft
+option.WATER_COLOR_MODE=Wasserfarbe
+value.WATER_COLOR_MODE.0=Biom-Farbe
+value.WATER_COLOR_MODE.1=Klares Tropenwasser
+
+option.WAVING_PLANTS=Wehende Pflanzen
+option.WAVING_LEAVES=Wehende Blaetter
+option.WAVING_STRENGTH=Windstaerke
+option.WAVING_SPEED=Windgeschwindigkeit
+
+option.TONEMAP=Tonemapping
+value.TONEMAP.0=Reinhard (neutral)
+value.TONEMAP.1=ACES (filmisch)
+value.TONEMAP.2=Uncharted 2
+option.EXPOSURE=Belichtung
+option.SATURATION=Saettigung
+option.CONTRAST=Kontrast
+option.VIGNETTE=Vignette
+option.BLOOM=Bloom
+option.BLOOM.comment=Leichtes Leuchten heller Flaechen. Ein zusaetzlicher Vollbild-Pass (~5-10 % FPS).
+option.BLOOM_STRENGTH=Bloom-Staerke
+option.GRAIN=Filmkorn
+option.GRAIN_STRENGTH=Filmkorn-Staerke
+option.GAMMA=Gamma

@@ -1,0 +1,71 @@
+profile.NIEDRIG=Low
+profile.MITTEL=Medium (UHD 620)
+profile.HOCH=High
+profile.ULTRA=Ultra
+profile.comment=Medium is tuned for the HP EliteBook 850 G5 (Intel UHD 620).
+
+screen.SCHATTEN=Shadows
+screen.LICHT=Lighting
+screen.HIMMEL=Sky & Fog
+screen.WASSER=Water
+screen.ANIMATION=Wind & Animation
+screen.BILD=Image Look
+
+option.SHADOWS=Shadows
+option.SHADOWS.comment=Dynamic sun/moon shadows. Biggest realism gain, also the most expensive effect.
+option.shadowMapResolution=Shadow Resolution
+option.shadowMapResolution.comment=1024 is the sweet spot for the UHD 620. 2048 only on a strong GPU.
+option.shadowDistance=Shadow Distance
+option.SHADOW_SAMPLES=Shadow Softness (Samples)
+option.SHADOW_SOFTNESS=Shadow Blur
+option.SHADOW_DISTORTION=Shadow Distortion
+option.COLORED_SHADOWS=Colored Shadows
+option.ENTITY_SHADOWS=Mob Shadows
+option.sunPathRotation=Sun Path Rotation
+
+option.SUN_INTENSITY=Sun Intensity
+option.AMBIENT_INTENSITY=Ambient Light
+option.NIGHT_BRIGHTNESS=Night Brightness
+option.TORCH_INTENSITY=Torch Brightness
+option.TORCH_TEMPERATURE=Torch Color
+value.TORCH_TEMPERATURE.0=Cool
+value.TORCH_TEMPERATURE.1=Warm
+value.TORCH_TEMPERATURE.2=Very warm
+option.SPECULAR=Specular Highlights
+option.RAIN_WETNESS=Wet Surfaces in Rain
+
+option.STARS=Stars
+option.STAR_BRIGHTNESS=Star Brightness
+option.SUN_GLOW=Sun Glow
+option.FOG=Fog
+option.FOG_DENSITY=Fog Density
+option.FOG_HEIGHT=Ground Fog
+option.FOG_HEIGHT_LEVEL=Ground Fog Height (Y)
+option.CLOUD_BRIGHTNESS=Cloud Brightness
+
+option.WATER_WAVES=Waves
+option.WATER_WAVE_HEIGHT=Wave Height
+option.WATER_REFLECTION=Water Reflection
+option.WATER_ALPHA=Water Opacity
+option.WATER_COLOR_MODE=Water Color
+value.WATER_COLOR_MODE.0=Biome color
+value.WATER_COLOR_MODE.1=Clear tropical water
+
+option.WAVING_PLANTS=Waving Plants
+option.WAVING_LEAVES=Waving Leaves
+option.WAVING_STRENGTH=Wind Strength
+option.WAVING_SPEED=Wind Speed
+
+option.TONEMAP=Tonemapping
+value.TONEMAP.0=Reinhard (neutral)
+value.TONEMAP.1=ACES (filmic)
+value.TONEMAP.2=Uncharted 2
+option.EXPOSURE=Exposure
+option.SATURATION=Saturation
+option.CONTRAST=Contrast
+option.VIGNETTE=Vignette
+option.BLOOM=Bloom
+option.BLOOM_STRENGTH=Bloom Strength
+option.GRAIN=Film Grain
+option.GRAIN_STRENGTH=Film Grain Strength
+option.GAMMA=Gamma
